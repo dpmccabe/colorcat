@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1048 252" width="1048" height="252">
+<rect x="0" y="0" width="524" height="252" fill="#ffffff"/>
+<text x="16" y="36" fill="#222" font-size="13" font-family="system-ui, sans-serif">n = 2</text><text x="16" y="52" fill="#222" opacity="0.6" font-size="10" font-family="system-ui, sans-serif">min ΔE 0.48</text>
+<rect x="92" y="20" width="28" height="36" rx="4" fill="#025903"/>
+<rect x="124" y="20" width="28" height="36" rx="4" fill="#c306fc"/>
+<text x="16" y="80" fill="#222" font-size="13" font-family="system-ui, sans-serif">n = 3</text><text x="16" y="96" fill="#222" opacity="0.6" font-size="10" font-family="system-ui, sans-serif">min ΔE 0.44</text>
+<rect x="92" y="64" width="28" height="36" rx="4" fill="#0104d9"/>
+<rect x="124" y="64" width="28" height="36" rx="4" fill="#f907a6"/>
+<rect x="156" y="64" width="28" height="36" rx="4" fill="#069727"/>
+<text x="16" y="124" fill="#222" font-size="13" font-family="system-ui, sans-serif">n = 5</text><text x="16" y="140" fill="#222" opacity="0.6" font-size="10" font-family="system-ui, sans-serif">min ΔE 0.33</text>
+<rect x="92" y="108" width="28" height="36" rx="4" fill="#6b0293"/>
+<rect x="124" y="108" width="28" height="36" rx="4" fill="#5dc80a"/>
+<rect x="156" y="108" width="28" height="36" rx="4" fill="#ec4406"/>
+<rect x="188" y="108" width="28" height="36" rx="4" fill="#689cfe"/>
+<rect x="220" y="108" width="28" height="36" rx="4" fill="#025905"/>
+<text x="16" y="168" fill="#222" font-size="13" font-family="system-ui, sans-serif">n = 8</text><text x="16" y="184" fill="#222" opacity="0.6" font-size="10" font-family="system-ui, sans-serif">min ΔE 0.25</text>
+<rect x="92" y="152" width="28" height="36" rx="4" fill="#0f04d7"/>
+<rect x="124" y="152" width="28" height="36" rx="4" fill="#0dcd82"/>
+<rect x="156" y="152" width="28" height="36" rx="4" fill="#fe79b6"/>
+<rect x="188" y="152" width="28" height="36" rx="4" fill="#065545"/>
+<rect x="220" y="152" width="28" height="36" rx="4" fill="#0897f6"/>
+<rect x="252" y="152" width="28" height="36" rx="4" fill="#b027fe"/>
+<rect x="284" y="152" width="28" height="36" rx="4" fill="#7c026b"/>
+<rect x="316" y="152" width="28" height="36" rx="4" fill="#b25705"/>
+<text x="16" y="212" fill="#222" font-size="13" font-family="system-ui, sans-serif">n = 13</text><text x="16" y="228" fill="#222" opacity="0.6" font-size="10" font-family="system-ui, sans-serif">min ΔE 0.19</text>
+<rect x="92" y="196" width="28" height="36" rx="4" fill="#64039d"/>
+<rect x="124" y="196" width="28" height="36" rx="4" fill="#c9ac0c"/>
+<rect x="156" y="196" width="28" height="36" rx="4" fill="#fb5cfe"/>
+<rect x="188" y="196" width="28" height="36" rx="4" fill="#0a82b8"/>
+<rect x="220" y="196" width="28" height="36" rx="4" fill="#8a031d"/>
+<rect x="252" y="196" width="28" height="36" rx="4" fill="#0e22fe"/>
+<rect x="284" y="196" width="28" height="36" rx="4" fill="#088e39"/>
+<rect x="316" y="196" width="28" height="36" rx="4" fill="#b54396"/>
+<rect x="348" y="196" width="28" height="36" rx="4" fill="#ab6307"/>
+<rect x="380" y="196" width="28" height="36" rx="4" fill="#255051"/>
+<rect x="412" y="196" width="28" height="36" rx="4" fill="#9ea3fe"/>
+<rect x="444" y="196" width="28" height="36" rx="4" fill="#fe828c"/>
+<rect x="476" y="196" width="28" height="36" rx="4" fill="#11c8b7"/>
+<rect x="524" y="0" width="524" height="252" fill="#000000"/>
+<text x="540" y="36" fill="#eee" font-size="13" font-family="system-ui, sans-serif">n = 2</text><text x="540" y="52" fill="#eee" opacity="0.6" font-size="10" font-family="system-ui, sans-serif">min ΔE 0.64</text>
+<rect x="616" y="20" width="28" height="36" rx="4" fill="#19ff0c"/>
+<rect x="648" y="20" width="28" height="36" rx="4" fill="#c706ee"/>
+<text x="540" y="80" fill="#eee" font-size="13" font-family="system-ui, sans-serif">n = 3</text><text x="540" y="96" fill="#eee" opacity="0.6" font-size="10" font-family="system-ui, sans-serif">min ΔE 0.40</text>
+<rect x="616" y="64" width="28" height="36" rx="4" fill="#3ffe32"/>
+<rect x="648" y="64" width="28" height="36" rx="4" fill="#ed3104"/>
+<rect x="680" y="64" width="28" height="36" rx="4" fill="#0e86fe"/>
+<text x="540" y="124" fill="#eee" font-size="13" font-family="system-ui, sans-serif">n = 5</text><text x="540" y="140" fill="#eee" opacity="0.6" font-size="10" font-family="system-ui, sans-serif">min ΔE 0.34</text>
+<rect x="616" y="108" width="28" height="36" rx="4" fill="#96fe0c"/>
+<rect x="648" y="108" width="28" height="36" rx="4" fill="#9c46fe"/>
+<rect x="680" y="108" width="28" height="36" rx="4" fill="#ee1a04"/>
+<rect x="712" y="108" width="28" height="36" rx="4" fill="#fec9fd"/>
+<rect x="744" y="108" width="28" height="36" rx="4" fill="#0d967a"/>
+<text x="540" y="168" fill="#eee" font-size="13" font-family="system-ui, sans-serif">n = 8</text><text x="540" y="184" fill="#eee" opacity="0.6" font-size="10" font-family="system-ui, sans-serif">min ΔE 0.24</text>
+<rect x="616" y="152" width="28" height="36" rx="4" fill="#2aff5f"/>
+<rect x="648" y="152" width="28" height="36" rx="4" fill="#c505e9"/>
+<rect x="680" y="152" width="28" height="36" rx="4" fill="#e13e0a"/>
+<rect x="712" y="152" width="28" height="36" rx="4" fill="#2e993e"/>
+<rect x="744" y="152" width="28" height="36" rx="4" fill="#fea3eb"/>
+<rect x="776" y="152" width="28" height="36" rx="4" fill="#047bfb"/>
+<rect x="808" y="152" width="28" height="36" rx="4" fill="#feb70e"/>
+<rect x="840" y="152" width="28" height="36" rx="4" fill="#25defe"/>
+<text x="540" y="212" fill="#eee" font-size="13" font-family="system-ui, sans-serif">n = 13</text><text x="540" y="228" fill="#eee" opacity="0.6" font-size="10" font-family="system-ui, sans-serif">min ΔE 0.19</text>
+<rect x="616" y="196" width="28" height="36" rx="4" fill="#eee410"/>
+<rect x="648" y="196" width="28" height="36" rx="4" fill="#944efe"/>
+<rect x="680" y="196" width="28" height="36" rx="4" fill="#e92b04"/>
+<rect x="712" y="196" width="28" height="36" rx="4" fill="#0fba9e"/>
+<rect x="744" y="196" width="28" height="36" rx="4" fill="#fe7db2"/>
+<rect x="776" y="196" width="28" height="36" rx="4" fill="#18fdf1"/>
+<rect x="808" y="196" width="28" height="36" rx="4" fill="#fb08f6"/>
+<rect x="840" y="196" width="28" height="36" rx="4" fill="#0787d4"/>
+<rect x="872" y="196" width="28" height="36" rx="4" fill="#948109"/>
+<rect x="904" y="196" width="28" height="36" rx="4" fill="#fb960d"/>
+<rect x="936" y="196" width="28" height="36" rx="4" fill="#0ce22a"/>
+<rect x="968" y="196" width="28" height="36" rx="4" fill="#fed1cb"/>
+<rect x="1000" y="196" width="28" height="36" rx="4" fill="#9ab3fe"/>
+</svg>
