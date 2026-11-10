@@ -10,7 +10,7 @@ legend entries, cluster labels).
 >>> palette(8, background="black")
 ```
 
-![Palettes on white and black backgrounds](docs/gallery.svg)
+![Palettes on white and black backgrounds](https://raw.githubusercontent.com/dpmccabe/colorcat/main/docs/gallery.svg)
 
 - Colors are chosen to maximize the smallest perceptual distance between any two of
   them **and** between each of them and the background.
@@ -128,4 +128,4 @@ uv run python benchmarks/make_gallery.py   # regenerate docs/gallery.svg
 Layout: `_oklab.py` (conversions), `_distance.py` (the single distance definition),
 `_constraints.py` (built-in ranges), `_feasible.py` (gamut and projection),
 `_energy.py` (optimizer), `_format.py` (parsing, quantization, formats),
-`palette.py` (public API), `cli.py`. See [`plan.md`](plan.md) for the design.
+`palette.py` (public API), `cli.py`. See [`plan.md`](https://github.com/dpmccabe/colorcat/blob/main/plan.md) for the design.

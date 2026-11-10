@@ -3,6 +3,18 @@ name = "colorcat"
 version = "0.1.0"
 description = "Generate maximally distinct colors for categorical data palettes."
 readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+keywords = ["color", "palette", "categorical", "visualization", "oklab", "colorblind"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering :: Visualization",
+    "Typing :: Typed",
+]
 authors = [
     { name = "Devin McCabe", email = "dmccabe@broadinstitute.org" }
 ]
@@ -10,6 +22,11 @@ requires-python = ">=3.12"
 dependencies = [
     "numpy>=1.26",
 ]
+
+[project.urls]
+Homepage = "https://github.com/dpmccabe/colorcat"
+Source = "https://github.com/dpmccabe/colorcat"
+Changelog = "https://github.com/dpmccabe/colorcat/blob/main/CHANGELOG.md"
 
 [project.scripts]
 colorcat = "colorcat.cli:main"
