@@ -36,13 +36,14 @@ def pairwise_distance(
     """
     a = np.asarray(a, dtype=np.float64)
     b = a if b is None else np.asarray(b, dtype=np.float64)
-    best = None
+    best: Array | None = None
     for view in views(cvd):
         va = a if view is None else simulate(a, view)
         vb = b if view is None else simulate(b, view)
         diff = va[:, None, :] - vb[None, :, :]
         d = np.sqrt(np.sum(diff * diff, axis=-1))
         best = d if best is None else np.minimum(best, d)
+    assert best is not None  # views() always includes normal vision
     return best
 
 

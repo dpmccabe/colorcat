@@ -33,7 +33,7 @@ def test_inset_shrinks_lightness():
 def test_unknown_backgrounds_raise_listing_allowed_values():
     for bad in ["red", "#ffffff", "White", "", None, 0]:
         with pytest.raises(ValueError, match="'white', 'black'"):
-            get_constraints(bad)
+            get_constraints(bad)  # pyrefly: ignore[bad-argument-type]
 
 
 def test_constraints_are_frozen():

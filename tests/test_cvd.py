@@ -94,7 +94,7 @@ def test_palette_with_cvd_is_valid_deterministic_and_helps():
 
 def test_palette_rejects_unknown_cvd():
     with pytest.raises(ValueError, match="cvd entries"):
-        palette(3, cvd=["blue"])
+        palette(3, cvd=["blue"])  # pyrefly: ignore[bad-argument-type]
 
 
 def test_cli_cvd(capsys):

@@ -13,7 +13,7 @@ the optimizer's gradients) it is computed analytically.
 
 from __future__ import annotations
 
-from typing import Literal
+from typing import Literal, cast, overload
 
 import numpy as np
 from numpy.typing import ArrayLike
@@ -46,7 +46,7 @@ _MATRICES: dict[str, Array] = {
     ),
 }
 
-CVD_TYPES: tuple[str, ...] = tuple(_MATRICES)
+CVD_TYPES: tuple[CvdType, ...] = cast("tuple[CvdType, ...]", tuple(_MATRICES))
 
 # The simulation as a linear map on LMS, so only cube roots are nonlinear.
 _LMS_MAPS = {k: _M1 @ m @ _M1_INV for k, m in _MATRICES.items()}
@@ -54,7 +54,7 @@ _LMS_MAPS = {k: _M1 @ m @ _M1_INV for k, m in _MATRICES.items()}
 _MIN_CBRT_SQ = 1e-8  # keeps the cube-root derivative finite near black
 
 
-def normalize_cvd(cvd: str | None | ArrayLike) -> tuple[str, ...]:
+def normalize_cvd(cvd: str | None | ArrayLike) -> tuple[CvdType, ...]:
     """Validate ``cvd`` (a name or a sequence of names) into a tuple without repeats."""
     if cvd is None:
         return ()
@@ -68,9 +68,13 @@ def normalize_cvd(cvd: str | None | ArrayLike) -> tuple[str, ...]:
         if name not in CVD_TYPES:
             allowed = ", ".join(repr(k) for k in CVD_TYPES)
             raise ValueError(f"cvd entries must be one of {allowed}; got {name!r}")
-    return tuple(dict.fromkeys(names))
+    return cast("tuple[CvdType, ...]", tuple(dict.fromkeys(names)))
 
 
+@overload
+def simulate(lab: ArrayLike, kind: str, jacobian: Literal[False] = False) -> Array: ...
+@overload
+def simulate(lab: ArrayLike, kind: str, jacobian: Literal[True]) -> tuple[Array, Array]: ...
 def simulate(lab: ArrayLike, kind: str, jacobian: bool = False) -> Array | tuple[Array, Array]:
     """The OKLab colors ``lab`` ``(..., 3)`` as seen with deficiency ``kind``.
 

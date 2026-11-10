@@ -6,12 +6,13 @@ Usage: python benchmarks/make_gallery.py   (plain SVG, no plotting dependency)
 from pathlib import Path
 
 from colorcat import min_distance, palette
+from colorcat._constraints import Background
 
 SIZES = (2, 3, 5, 8, 13)
 SW, GAP, PAD, ROW, LABEL = 28, 4, 16, 44, 92
 
 
-def panel(background: str, x0: int, width: int, fg: str, bg: str) -> str:
+def panel(background: Background, x0: int, width: int, fg: str, bg: str) -> str:
     out = [
         f'<rect x="{x0}" y="0" width="{width}" height="{PAD * 2 + ROW * len(SIZES)}" fill="{bg}"/>'
     ]

@@ -30,12 +30,13 @@ import time
 import warnings
 from concurrent.futures import ProcessPoolExecutor
 from datetime import date
+from typing import Any
 from pathlib import Path
 
 import numpy as np
 
 from colorcat import _energy, palette
-from colorcat._constraints import get_constraints
+from colorcat._constraints import Background, get_constraints
 from colorcat._energy import min_distance_with_anchors
 from colorcat._format import hex_to_oklab
 
@@ -64,7 +65,7 @@ SWEEPS: dict[str, list] = {
     "restart_count": [1, 2, 4, 8, 16, 32],
 }
 
-Case = tuple[str, int, int]  # (background, n, seed)
+Case = tuple[Background, int, int]  # (background, n, seed)
 
 
 def current_value(name: str):
@@ -100,7 +101,7 @@ def fmt_value(v) -> str:
     return f"{v:g}" if isinstance(v, float) else str(v)
 
 
-def summarize(scores: dict[Case, float], secs: dict[Case, float], base: dict[Case, float], base_secs: dict[Case, float]):
+def summarize(scores: dict[Case, float], secs: dict[Case, float], base: dict[Case, float], base_secs: dict[Case, float]) -> dict[str, Any]:
     cases = list(base)
     ratios = np.array([scores[c] / base[c] for c in cases])
     n = len(ratios)

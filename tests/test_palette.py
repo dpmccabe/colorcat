@@ -38,7 +38,7 @@ def test_default_seed_is_zero():
 
 
 def test_numpy_integers_are_accepted():
-    assert palette(np.int64(3), restart_count=np.int32(1)) == palette(3, restart_count=1)
+    assert palette(np.int64(3), restart_count=np.int32(1))  # pyrefly: ignore[bad-argument-type] == palette(3, restart_count=1)
 
 
 @pytest.mark.parametrize("background", ["white", "black"])
@@ -97,7 +97,7 @@ def test_validation(kwargs, exc):
 
 def test_background_error_lists_allowed_values():
     with pytest.raises(ValueError, match="'white', 'black'"):
-        palette(3, background="grey")
+        palette(3, background="grey")  # pyrefly: ignore[bad-argument-type]
 
 
 def test_warns_when_colors_are_hard_to_tell_apart():

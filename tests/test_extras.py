@@ -29,7 +29,7 @@ def test_formats():
 
 def test_bad_format():
     with pytest.raises(ValueError, match="'hex', 'rgb', 'oklab', 'oklch'"):
-        palette(3, color_format="cmyk")
+        palette(3, color_format="cmyk")  # pyrefly: ignore[bad-argument-type]
 
 
 def test_fixed_colors_are_kept_apart_and_not_returned():

@@ -103,7 +103,7 @@ def palette(
     if seed is not None:
         seed = _as_int(seed, "seed", 0)
     constraints = get_constraints(background)
-    cvd = normalize_cvd(cvd)
+    cvd_views = normalize_cvd(cvd)
     if color_format not in FORMATS:
         raise ValueError(
             f"color_format must be one of {', '.join(repr(f) for f in FORMATS)}; got {color_format!r}"
@@ -113,15 +113,15 @@ def palette(
         return []
 
     anchors = np.concatenate([constraints.background_lab[None, :], extra])
-    result = optimize(seed, n, constraints, anchors, restart_count, cvd)
+    result = optimize(seed, n, constraints, anchors, restart_count, cvd_views)
     if result.min_distance < LOW_DISTANCE_WARNING:
         warnings.warn(
             f"the closest colors in this {n}-color palette differ by only "
-            f"{result.min_distance:.3f} (ΔE_OK{' in the worst view' if cvd else ''}); "
+            f"{result.min_distance:.3f} (ΔE_OK{' in the worst view' if cvd_views else ''}); "
             "they may be hard to tell apart",
             stacklevel=2,
         )
-    order = _farthest_first(result.lab, constraints.background_lab, cvd)
+    order = _farthest_first(result.lab, constraints.background_lab, cvd_views)
     return format_colors(result.rgb8[order], color_format)
 
 

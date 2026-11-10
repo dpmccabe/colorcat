@@ -37,5 +37,11 @@ build-backend = "uv_build"
 
 [dependency-groups]
 dev = [
+    "pyrefly>=1.4.1",
     "pytest>=9.2.0",
 ]
+
+[tool.pyrefly]
+project-includes = ["src", "tests", "benchmarks"]
+search-path = ["src", "benchmarks"]
+python-version = "3.12"
