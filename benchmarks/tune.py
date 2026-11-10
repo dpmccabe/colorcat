@@ -25,13 +25,12 @@ import inspect
 import math
 import os
 import platform
-import sys
 import time
 import warnings
 from concurrent.futures import ProcessPoolExecutor
 from datetime import date
-from typing import Any
 from pathlib import Path
+from typing import Any
 
 import numpy as np
 
@@ -101,7 +100,12 @@ def fmt_value(v) -> str:
     return f"{v:g}" if isinstance(v, float) else str(v)
 
 
-def summarize(scores: dict[Case, float], secs: dict[Case, float], base: dict[Case, float], base_secs: dict[Case, float]) -> dict[str, Any]:
+def summarize(
+    scores: dict[Case, float],
+    secs: dict[Case, float],
+    base: dict[Case, float],
+    base_secs: dict[Case, float],
+) -> dict[str, Any]:
     cases = list(base)
     ratios = np.array([scores[c] / base[c] for c in cases])
     n = len(ratios)
@@ -115,7 +119,9 @@ def summarize(scores: dict[Case, float], secs: dict[Case, float], base: dict[Cas
         "ties": n - wins - losses,
         "losses": losses,
         "mean_score": float(np.mean([scores[c] for c in cases])),
-        "time_ratio": float(np.mean([secs[c] for c in cases]) / np.mean([base_secs[c] for c in cases])),
+        "time_ratio": float(
+            np.mean([secs[c] for c in cases]) / np.mean([base_secs[c] for c in cases])
+        ),
         "mean_sec": float(np.mean([secs[c] for c in cases])),
         "by_n": {
             n_: float(np.mean([scores[c] / base[c] for c in cases if c[1] == n_]))
@@ -125,11 +131,15 @@ def summarize(scores: dict[Case, float], secs: dict[Case, float], base: dict[Cas
 
 
 def main() -> None:
-    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap = argparse.ArgumentParser(
+        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
+    )
     ap.add_argument("--quick", action="store_true", help="fewer n values and seeds (smoke test)")
     ap.add_argument("--seeds", type=int, default=3, help="seeds per (background, n) case")
     ap.add_argument("--ns", type=int, nargs="+", default=[3, 5, 8, 12, 20, 30])
-    ap.add_argument("--backgrounds", nargs="+", default=["white", "black"], choices=["white", "black"])
+    ap.add_argument(
+        "--backgrounds", nargs="+", default=["white", "black"], choices=["white", "black"]
+    )
     ap.add_argument("--groups", nargs="+", default=list(SWEEPS), choices=list(SWEEPS))
     ap.add_argument("--jobs", type=int, default=max(1, (os.cpu_count() or 2) - 1))
     ap.add_argument("--out", type=Path, default=Path(__file__).parent / "tune.md")
@@ -137,7 +147,9 @@ def main() -> None:
     if args.quick:
         args.ns, args.seeds = [3, 8, 20], 2
 
-    cases: list[Case] = [(b, n, s) for b in args.backgrounds for n in args.ns for s in range(args.seeds)]
+    cases: list[Case] = [
+        (b, n, s) for b in args.backgrounds for n in args.ns for s in range(args.seeds)
+    ]
 
     # Unique configs: the baseline plus every non-default candidate.
     configs: dict[tuple, dict] = {(): {}}
@@ -147,7 +159,10 @@ def main() -> None:
                 configs[((group, v),)] = {group: v}
 
     tasks = [(key, c) for key in configs for c in cases]
-    print(f"{len(configs)} configs x {len(cases)} cases = {len(tasks)} palettes, {args.jobs} workers", flush=True)
+    print(
+        f"{len(configs)} configs x {len(cases)} cases = {len(tasks)} palettes, {args.jobs} workers",
+        flush=True,
+    )
 
     results: dict[tuple, dict[Case, tuple[float, float]]] = {key: {} for key in configs}
     start = time.perf_counter()
@@ -159,7 +174,9 @@ def main() -> None:
                 print(f"  {i}/{len(futures)}  {time.perf_counter() - start:.0f}s", flush=True)
 
     def split(key):
-        return {c: r[0] for c, r in results[key].items()}, {c: r[1] for c, r in results[key].items()}
+        return {c: r[0] for c, r in results[key].items()}, {
+            c: r[1] for c, r in results[key].items()
+        }
 
     base_scores, base_secs = split(())
     summaries = {key: summarize(*split(key), base_scores, base_secs) for key in configs}
@@ -169,31 +186,47 @@ def main() -> None:
     w = lines.append
     w("# colorcat hyperparameter tuning")
     w("")
-    w(f"Generated {date.today()} by `benchmarks/tune.py` on {platform.platform()}, "
-      f"Python {platform.python_version()}, NumPy {np.__version__}.")
+    w(
+        f"Generated {date.today()} by `benchmarks/tune.py` on {platform.platform()}, "
+        f"Python {platform.python_version()}, NumPy {np.__version__}."
+    )
     w("")
     w("## Setup")
     w("")
-    w(f"- Backgrounds: {', '.join(args.backgrounds)}; n: {', '.join(map(str, args.ns))}; "
-      f"seeds: 0-{args.seeds - 1} ({len(cases)} cases per candidate).")
-    w("- Score: min ΔE_OK between any two colors or a color and the background, after 8-bit "
-      "quantization (higher is better).")
-    w("- **vs current** = mean over cases of `candidate score / current-default score`; "
-      "above 100% is better than the current defaults. **±** is the standard error of that mean, "
-      "so differences smaller than about 2× it are likely noise.")
-    w("- **W/T/L** counts cases where the candidate scored higher / equal / lower than the current defaults.")
-    w("- **time** is mean runtime relative to the current defaults (measured with parallel workers: "
-      "relative values are meaningful, absolute seconds are not).")
-    w("- Sweeps change one setting at a time with everything else at its current default. "
-      "Interactions are not explored.")
+    w(
+        f"- Backgrounds: {', '.join(args.backgrounds)}; n: {', '.join(map(str, args.ns))}; "
+        f"seeds: 0-{args.seeds - 1} ({len(cases)} cases per candidate)."
+    )
+    w(
+        "- Score: min ΔE_OK between any two colors or a color and the background, after 8-bit "
+        "quantization (higher is better)."
+    )
+    w(
+        "- **vs current** = mean over cases of `candidate score / current-default score`; "
+        "above 100% is better than the current defaults. **±** is the standard error of that mean, "
+        "so differences smaller than about 2× it are likely noise."
+    )
+    w(
+        "- **W/T/L** counts cases where the candidate scored higher / equal / lower than the current defaults."
+    )
+    w(
+        "- **time** is mean runtime relative to the current defaults (measured with parallel workers: "
+        "relative values are meaningful, absolute seconds are not)."
+    )
+    w(
+        "- Sweeps change one setting at a time with everything else at its current default. "
+        "Interactions are not explored."
+    )
     w("")
     w("Current defaults:")
     w("")
     for name in SWEEPS:
         w(f"- `{name}` = {fmt_value(current_value(name))}")
     w("")
-    w(f"Current-default mean score over these cases: **{base_summary['mean_score']:.4f}**, "
-      f"mean time {base_summary['mean_sec']:.2f} s per palette.")
+    w(
+        f"Current-default mean score over these cases: **{base_summary['mean_score']:.4f}**, "
+        f"mean time {base_summary['mean_sec']:.2f} s per palette."
+    )
     w("")
 
     ns = sorted({c[1] for c in cases})
@@ -209,7 +242,9 @@ def main() -> None:
             se = "" if is_default else f"{100 * s['se']:.2f}"
             wtl = "" if is_default else f"{s['wins']}/{s['ties']}/{s['losses']}"
             by_n = " | ".join(f"{100 * s['by_n'][n]:.1f}%" for n in ns)
-            w(f"| {label} | {100 * s['ratio']:.2f}% | {se} | {wtl} | {s['time_ratio']:.2f}x | {by_n} |")
+            w(
+                f"| {label} | {100 * s['ratio']:.2f}% | {se} | {wtl} | {s['time_ratio']:.2f}x | {by_n} |"
+            )
         w("")
 
     # Ranked shortlist: best quality per candidate, flagged by cost.
@@ -217,24 +252,32 @@ def main() -> None:
     w("")
     w("| rank | setting | vs current | ± | time |")
     w("|---|---|---|---|---|")
-    ranked = sorted(
-        (k for k in configs if k), key=lambda k: summaries[k]["ratio"], reverse=True
-    )
+    ranked = sorted((k for k in configs if k), key=lambda k: summaries[k]["ratio"], reverse=True)
     for i, key in enumerate(ranked, 1):
-        (name, v), = key
+        ((name, v),) = key
         s = summaries[key]
-        w(f"| {i} | `{name}` = {fmt_value(v)} | {100 * s['ratio']:.2f}% | {100 * s['se']:.2f} | {s['time_ratio']:.2f}x |")
+        w(
+            f"| {i} | `{name}` = {fmt_value(v)} | {100 * s['ratio']:.2f}% | {100 * s['se']:.2f} | {s['time_ratio']:.2f}x |"
+        )
     w("")
     w("## How to choose")
     w("")
-    w("- Prefer a change only if its gain is clearly larger than **±** and it wins more cases than it loses.")
-    w("- Gains that cost much more **time** are a trade-off; `restart_count` is the user-facing knob for that, "
-      "so prefer fixing quality per restart first.")
-    w("- Check the per-`n` columns: a setting that helps large `n` but hurts small `n` (or vice versa) "
-      "shows up there, not in the overall mean.")
-    w("- After changing defaults, re-run this script (candidates are always compared with whatever the "
-      "defaults are at run time) and `uv run pytest`; the reproducibility tests do not pin exact colors, "
-      "but the README example and gallery would change.")
+    w(
+        "- Prefer a change only if its gain is clearly larger than **±** and it wins more cases than it loses."
+    )
+    w(
+        "- Gains that cost much more **time** are a trade-off; `restart_count` is the user-facing knob for that, "
+        "so prefer fixing quality per restart first."
+    )
+    w(
+        "- Check the per-`n` columns: a setting that helps large `n` but hurts small `n` (or vice versa) "
+        "shows up there, not in the overall mean."
+    )
+    w(
+        "- After changing defaults, re-run this script (candidates are always compared with whatever the "
+        "defaults are at run time) and `uv run pytest`; the reproducibility tests do not pin exact colors, "
+        "but the README example and gallery would change."
+    )
     w("")
 
     args.out.write_text("\n".join(lines))

@@ -8,7 +8,7 @@ from colorcat._format import hex_to_oklab, hex_to_srgb
 from colorcat._oklab import oklab_to_oklch
 from colorcat.cli import main
 
-FAST = dict(restart_count=2)
+FAST = {"restart_count": 2}
 
 
 def lab(colors):
@@ -18,7 +18,7 @@ def lab(colors):
 def test_formats():
     hexes = palette(4, **FAST)
     rgb = palette(4, color_format="rgb", **FAST)
-    assert rgb == [tuple(int(round(v * 255)) for v in hex_to_srgb(h)) for h in hexes]
+    assert rgb == [tuple(round(v * 255) for v in hex_to_srgb(h)) for h in hexes]
     assert all(isinstance(v, int) for c in rgb for v in c)
     np.testing.assert_allclose(palette(4, color_format="oklab", **FAST), lab(hexes), atol=1e-12)
     np.testing.assert_allclose(
@@ -63,11 +63,11 @@ def test_extras_are_deterministic():
 @pytest.mark.parametrize(
     "kwargs, exc",
     [
-        (dict(fixed=["nothex"]), ValueError),
-        (dict(exclude=["#12"]), ValueError),
-        (dict(fixed="#ff0000"), TypeError),
-        (dict(exclude=5), TypeError),
-        (dict(fixed=[1]), ValueError),
+        ({"fixed": ["nothex"]}, ValueError),
+        ({"exclude": ["#12"]}, ValueError),
+        ({"fixed": "#ff0000"}, TypeError),
+        ({"exclude": 5}, TypeError),
+        ({"fixed": [1]}, ValueError),
     ],
 )
 def test_color_argument_validation(kwargs, exc):

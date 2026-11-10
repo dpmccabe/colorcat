@@ -25,9 +25,7 @@ def views(cvd: tuple[str, ...] = ()) -> tuple[str | None, ...]:
     return (None, *cvd)
 
 
-def pairwise_distance(
-    a: ArrayLike, b: ArrayLike | None = None, cvd: tuple[str, ...] = ()
-) -> Array:
+def pairwise_distance(a: ArrayLike, b: ArrayLike | None = None, cvd: tuple[str, ...] = ()) -> Array:
     """ΔE_OK between every color in ``a`` ``(m, 3)`` and every color in ``b`` ``(k, 3)``.
 
     Returns an ``(m, k)`` matrix. With ``b=None`` the distances are within ``a``

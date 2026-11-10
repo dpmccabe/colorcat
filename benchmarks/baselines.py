@@ -14,10 +14,29 @@ from colorcat._oklab import srgb_to_oklab
 # Named categorical palettes (Okabe-Ito without black; Tableau 10; Matplotlib tab10 is the same as Tableau's old 10).
 NAMED = {
     "okabe-ito": ["#e69f00", "#56b4e9", "#009e73", "#f0e442", "#0072b2", "#d55e00", "#cc79a7"],
-    "tableau10": ["#4e79a7", "#f28e2b", "#e15759", "#76b7b2", "#59a14f",
-                  "#edc948", "#b07aa1", "#ff9da7", "#9c755f", "#bab0ac"],
-    "set1": ["#e41a1c", "#377eb8", "#4daf4a", "#984ea3", "#ff7f00",
-             "#ffff33", "#a65628", "#f781bf", "#999999"],
+    "tableau10": [
+        "#4e79a7",
+        "#f28e2b",
+        "#e15759",
+        "#76b7b2",
+        "#59a14f",
+        "#edc948",
+        "#b07aa1",
+        "#ff9da7",
+        "#9c755f",
+        "#bab0ac",
+    ],
+    "set1": [
+        "#e41a1c",
+        "#377eb8",
+        "#4daf4a",
+        "#984ea3",
+        "#ff7f00",
+        "#ffff33",
+        "#a65628",
+        "#f781bf",
+        "#999999",
+    ],
 }
 
 
@@ -37,7 +56,9 @@ def random_min_distance(n: int, c: Constraints, draws: int = 50, seed: int = 0) 
     return float(np.median(scores))
 
 
-def farthest_point_min_distance(n: int, c: Constraints, candidates: int = 20000, seed: int = 0) -> float:
+def farthest_point_min_distance(
+    n: int, c: Constraints, candidates: int = 20000, seed: int = 0
+) -> float:
     """Greedy farthest-point sampling from the background over random feasible candidates."""
     rng = np.random.default_rng(seed)
     cand = srgb_to_oklab(quantize(sample(rng, candidates, c), c) / 255.0)

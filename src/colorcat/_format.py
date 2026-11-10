@@ -75,4 +75,6 @@ def format_colors(rgb8: ArrayLike, fmt: str) -> list:
         lab = srgb_to_oklab(rgb8 / 255.0)
         values = lab if fmt == "oklab" else oklab_to_oklch(lab)
         return [tuple(float(v) for v in row) for row in values]
-    raise ValueError(f"color_format must be one of {', '.join(repr(f) for f in FORMATS)}; got {fmt!r}")
+    raise ValueError(
+        f"color_format must be one of {', '.join(repr(f) for f in FORMATS)}; got {fmt!r}"
+    )

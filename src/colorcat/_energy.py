@@ -83,9 +83,7 @@ def energy_and_grad(
     return log_z / p, grad
 
 
-def min_distance_with_anchors(
-    x: ArrayLike, anchors: ArrayLike, cvd: tuple[str, ...] = ()
-) -> float:
+def min_distance_with_anchors(x: ArrayLike, anchors: ArrayLike, cvd: tuple[str, ...] = ()) -> float:
     """Smallest distance between any two particles or between a particle and an anchor."""
     x = np.asarray(x, dtype=np.float64)
     anchors = np.asarray(anchors, dtype=np.float64).reshape(-1, 3)
@@ -141,9 +139,7 @@ class Result:
     energy: float  # final-stage energy of the quantized colors
 
 
-def _evaluate(
-    x: Array, anchors: Array, constraints: Constraints, cvd: tuple[str, ...]
-) -> Result:
+def _evaluate(x: Array, anchors: Array, constraints: Constraints, cvd: tuple[str, ...]) -> Result:
     """Quantize ``x`` and score it."""
     rgb8 = quantize(x, constraints)
     lab = srgb_to_oklab(rgb8 / 255.0)

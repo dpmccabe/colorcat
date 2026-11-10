@@ -92,8 +92,5 @@ def simulate(lab: ArrayLike, kind: str, jacobian: bool = False) -> Array | tuple
     inner = 3.0 * root**2
     outer = 1.0 / (3.0 * np.maximum(seen_root**2, _MIN_CBRT_SQ))
     # J = M2 . diag(outer) . A . diag(inner) . M2^-1
-    jac = (
-        _M2
-        @ (outer[..., :, None] * (a_map @ (inner[..., :, None] * _M2_INV)))
-    )
+    jac = _M2 @ (outer[..., :, None] * (a_map @ (inner[..., :, None] * _M2_INV)))
     return out, jac

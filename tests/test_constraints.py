@@ -43,6 +43,6 @@ def test_constraints_are_frozen():
 
 
 def test_invalid_ranges_rejected():
-    base = dict(background="x", background_srgb=(1.0, 1.0, 1.0))
+    base = {"background": "x", "background_srgb": (1.0, 1.0, 1.0)}
     with pytest.raises(ValueError, match="lightness"):
         Constraints(**base, lightness=(0.8, 0.4))

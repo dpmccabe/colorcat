@@ -12,9 +12,7 @@ RNG = np.random.default_rng(3)
 def feasible(lab, c, tol=1e-9):
     L = oklab_to_oklch(lab)[..., 0]
     lo, hi = c.lightness_bounds
-    return (
-        (L >= lo - tol) & (L <= hi + tol) & in_gamut(lab)
-    )
+    return (L >= lo - tol) & (L <= hi + tol) & in_gamut(lab)
 
 
 def test_gamut_max_chroma_is_the_boundary():

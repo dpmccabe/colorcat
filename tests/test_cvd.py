@@ -58,7 +58,10 @@ def test_energy_gradient_with_cvd_matches_finite_differences():
             xp, xm = x.copy(), x.copy()
             xp[i, k] += eps
             xm[i, k] -= eps
-            num[i, k] = (energy_and_grad(xp, anchors, 8.0, cvd)[0] - energy_and_grad(xm, anchors, 8.0, cvd)[0]) / (2 * eps)
+            num[i, k] = (
+                energy_and_grad(xp, anchors, 8.0, cvd)[0]
+                - energy_and_grad(xm, anchors, 8.0, cvd)[0]
+            ) / (2 * eps)
     np.testing.assert_allclose(g, num, atol=1e-5)
 
 

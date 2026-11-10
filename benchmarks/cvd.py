@@ -28,8 +28,8 @@ from colorcat import palette
 from colorcat._constraints import get_constraints
 from colorcat._cvd import CVD_TYPES, simulate
 from colorcat._energy import min_distance_with_anchors
-from colorcat._oklab import oklab_to_srgb
 from colorcat._format import hex_to_oklab
+from colorcat._oklab import oklab_to_srgb
 
 VIEWS = ("normal", *CVD_TYPES)
 
@@ -43,10 +43,7 @@ def view_distances(colors: list[str], background: str) -> dict[str, float]:
     """Smallest pairwise ΔE_OK (with the background) in each single view."""
     lab = np.array([hex_to_oklab(c) for c in colors])
     bg = get_constraints(background).background_lab[None, :]
-    return {
-        v: min_distance_with_anchors(lab, bg, () if v == "normal" else (v,))
-        for v in VIEWS
-    }
+    return {v: min_distance_with_anchors(lab, bg, () if v == "normal" else (v,)) for v in VIEWS}
 
 
 def label(combo: tuple[str, ...]) -> str:
@@ -65,16 +62,16 @@ def swatch_svg(rows, background: str) -> str:
     bg = "#ffffff" if background == "white" else "#000000"
     fg = "#222222" if background == "white" else "#dddddd"
     out = [
-        f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {width} {height}" '
-        f'width="{width}" height="{height}" font-family="sans-serif" font-size="12">',
+        (
+            f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {width} {height}" '
+            f'width="{width}" height="{height}" font-family="sans-serif" font-size="12">'
+        ),
         f'<rect width="{width}" height="{height}" fill="{bg}"/>',
     ]
     for j, v in enumerate(VIEWS):
         x = pad + label_w + j * (group_w + col_gap)
         title = "normal vision" if v == "normal" else f"as seen with {v}"
-        out.append(
-            f'<text x="{x}" y="{pad + 12}" fill="{fg}" font-weight="bold">{title}</text>'
-        )
+        out.append(f'<text x="{x}" y="{pad + 12}" fill="{fg}" font-weight="bold">{title}</text>')
     for i, (combo, colors) in enumerate(rows):
         y = pad + head + i * (cell + row_gap)
         out.append(
@@ -123,9 +120,7 @@ def main() -> None:
         mean = {v: float(np.mean([d[v] for d in per_seed])) for v in VIEWS}
         asked = ["normal", *combo]
         design = float(np.mean([min(d[v] for v in asked) for d in per_seed]))
-        stats.append(
-            (combo, mean, design, view_distances(rows[-1][1], args.background))
-        )
+        stats.append((combo, mean, design, view_distances(rows[-1][1], args.background)))
         print(f"{label(combo):28s} design={design:.3f}", flush=True)
     elapsed = time.perf_counter() - start
 
@@ -136,14 +131,18 @@ def main() -> None:
     lines = [
         f"# CVD options: n={args.n}, {args.background} background",
         "",
-        f"Generated {date.today()} with `benchmarks/cvd.py` "
-        f"(restart_count={args.restarts}, {args.seeds} seeds, Python {platform.python_version()}, "
-        f"{elapsed:.0f} s).",
+        (
+            f"Generated {date.today()} with `benchmarks/cvd.py` "
+            f"(restart_count={args.restarts}, {args.seeds} seeds, Python {platform.python_version()}, "
+            f"{elapsed:.0f} s)."
+        ),
         "",
-        "Smallest pairwise ΔE_OK between any two colors or a color and the background, "
-        "mean over seeds. Bold = a view the optimizer was asked to protect. "
-        "*design* is the worst of the requested views (normal vision always counts), "
-        "and *vs. none* compares it with the unconstrained palette.",
+        (
+            "Smallest pairwise ΔE_OK between any two colors or a color and the background, "
+            "mean over seeds. Bold = a view the optimizer was asked to protect. "
+            "*design* is the worst of the requested views (normal vision always counts), "
+            "and *vs. none* compares it with the unconstrained palette."
+        ),
         "",
         "| `cvd` | design | vs. none | normal | protan | deutan | tritan | colors (seed 0) |",
         "|---|---|---|---|---|---|---|---|",
@@ -164,9 +163,11 @@ def main() -> None:
         "",
         f"![Palettes as seen with each deficiency]({svg_path.name})",
         "",
-        "Each row is one `cvd` setting; the columns are the same palette as seen with "
-        "normal vision and simulated for each deficiency (Machado et al. 2009, full "
-        "dichromacy).",
+        (
+            "Each row is one `cvd` setting; the columns are the same palette as seen with "
+            "normal vision and simulated for each deficiency (Machado et al. 2009, full "
+            "dichromacy)."
+        ),
         "",
     ]
     args.out.write_text("\n".join(lines))

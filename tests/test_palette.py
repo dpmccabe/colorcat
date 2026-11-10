@@ -79,15 +79,15 @@ def test_min_distance_helper():
 @pytest.mark.parametrize(
     "kwargs, exc",
     [
-        (dict(n=-1), ValueError),
-        (dict(n=2.5), TypeError),
-        (dict(n="3"), TypeError),
-        (dict(n=True), ValueError),
-        (dict(n=3, restart_count=0), ValueError),
-        (dict(n=3, restart_count=1.5), TypeError),
-        (dict(n=3, background="red"), ValueError),
-        (dict(n=3, background="#ffffff"), ValueError),
-        (dict(n=3, seed=1.5), TypeError),
+        ({"n": -1}, ValueError),
+        ({"n": 2.5}, TypeError),
+        ({"n": "3"}, TypeError),
+        ({"n": True}, ValueError),
+        ({"n": 3, "restart_count": 0}, ValueError),
+        ({"n": 3, "restart_count": 1.5}, TypeError),
+        ({"n": 3, "background": "red"}, ValueError),
+        ({"n": 3, "background": "#ffffff"}, ValueError),
+        ({"n": 3, "seed": 1.5}, TypeError),
     ],
 )
 def test_validation(kwargs, exc):

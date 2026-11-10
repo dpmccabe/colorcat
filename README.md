@@ -28,15 +28,15 @@ uv add colorcat        # once published; from a checkout: uv sync
 ```python
 from colorcat import palette, min_distance
 
-palette(6)                                  # on a white background (the default)
-palette(6, background="black")              # lighter colors for dark backgrounds
-palette(4, fixed=["#e41a1c", "#377eb8"])    # 4 NEW colors that extend two you already use
-palette(4, exclude=["#00aa00"])             # keep clear of a color used elsewhere
-palette(6, cvd=["deutan", "protan"])        # also distinct for red-green color blindness
-palette(6, color_format="rgb")                    # (r, g, b) tuples; also "oklab" and "oklch"
-palette(6, seed=3)                          # a different, similarly good palette
+palette(6)  # on a white background (the default)
+palette(6, background="black")  # lighter colors for dark backgrounds
+palette(4, fixed=["#e41a1c", "#377eb8"])  # 4 NEW colors that extend two you already use
+palette(4, exclude=["#00aa00"])  # keep clear of a color used elsewhere
+palette(6, cvd=["deutan", "protan"])  # also distinct for red-green color blindness
+palette(6, color_format="rgb")  # (r, g, b) tuples; also "oklab" and "oklch"
+palette(6, seed=3)  # a different, similarly good palette
 
-min_distance(palette(6))                    # distance between the closest pair
+min_distance(palette(6))  # distance between the closest pair
 ```
 
 ### `palette(n, *, background, restart_count, exclude, fixed, cvd, color_format, seed)`

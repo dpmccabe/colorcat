@@ -79,6 +79,4 @@ def get_constraints(background: str) -> Constraints:
         return _BUILTIN[background]
     except (KeyError, TypeError):
         allowed = ", ".join(repr(k) for k in _BUILTIN)
-        raise ValueError(
-            f"background must be one of {allowed}; got {background!r}"
-        ) from None
+        raise ValueError(f"background must be one of {allowed}; got {background!r}") from None

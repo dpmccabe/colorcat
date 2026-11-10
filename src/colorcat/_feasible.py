@@ -12,7 +12,7 @@ return OKLab arrays of shape ``(..., 3)``.
 
 from __future__ import annotations
 
-from functools import lru_cache
+from functools import cache
 
 import numpy as np
 from numpy.typing import ArrayLike
@@ -46,7 +46,7 @@ def gamut_max_chroma(L: ArrayLike, h: ArrayLike) -> Array:
     return lo
 
 
-@lru_cache(maxsize=None)
+@cache
 def _max_chroma(constraints: Constraints) -> float:
     """Largest feasible chroma anywhere in the lightness band, for sampling."""
     L_lo, L_hi = constraints.lightness_bounds

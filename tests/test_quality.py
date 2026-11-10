@@ -7,12 +7,12 @@ import numpy as np
 import pytest
 
 sys.path.insert(0, str(Path(__file__).parent.parent / "benchmarks"))
-from baselines import farthest_point_min_distance, named_min_distance, random_min_distance  # noqa: E402
+from baselines import farthest_point_min_distance, named_min_distance, random_min_distance
 
-from colorcat import palette  # noqa: E402
-from colorcat._constraints import get_constraints  # noqa: E402
-from colorcat._energy import min_distance_with_anchors  # noqa: E402
-from colorcat._format import hex_to_oklab  # noqa: E402
+from colorcat import palette
+from colorcat._constraints import get_constraints
+from colorcat._energy import min_distance_with_anchors
+from colorcat._format import hex_to_oklab
 
 
 def score(colors, c):

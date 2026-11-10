@@ -39,9 +39,20 @@ build-backend = "uv_build"
 dev = [
     "pyrefly>=1.4.1",
     "pytest>=9.2.0",
+    "ruff>=0.17.4",
 ]
 
 [tool.pyrefly]
 project-includes = ["src", "tests", "benchmarks"]
 search-path = ["src", "benchmarks"]
 python-version = "3.12"
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+
+[tool.ruff.lint]
+extend-select = ["I"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["colorcat"]
