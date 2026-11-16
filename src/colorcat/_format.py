@@ -9,7 +9,15 @@ import numpy as np
 from numpy.typing import ArrayLike
 
 from ._constraints import Constraints
-from ._oklab import Array, in_gamut, oklab_to_oklch, oklab_to_srgb, srgb_to_oklab
+from ._oklab import (
+    Array,
+    linear_srgb_to_oklab,
+    oklab_to_oklch,
+    oklab_to_srgb,
+    relative_luminance,
+    srgb_to_linear,
+    srgb_to_oklab,
+)
 
 FORMATS = ("hex", "rgb", "oklab", "oklch")
 
@@ -47,16 +55,18 @@ def lab_to_srgb8(lab: ArrayLike) -> np.ndarray:
 def quantize(lab: ArrayLike, constraints: Constraints) -> np.ndarray:
     """Snap OKLab colors ``(m, 3)`` to 8-bit sRGB, returning ``(m, 3)`` ints.
 
-    Plain rounding can step just outside the lightness band, so each color takes the nearest *feasible* lattice point among the
-    27 around its rounded value (falling back to plain rounding if none is).
+    Plain rounding can step just outside the contrast requirement, so each color
+    takes the nearest *feasible* lattice point among the 27 around its rounded
+    value (falling back to plain rounding if none is).
     """
     lab = np.asarray(lab, dtype=np.float64)
     base = lab_to_srgb8(lab)  # (m, 3)
     cand = np.clip(base[:, None, :] + _NEIGHBOURS[None, :, :], 0, 255)  # (m, 27, 3)
-    cand_lab = srgb_to_oklab(cand / 255.0)
-    L = oklab_to_oklch(cand_lab)[..., 0]
-    lo, hi = constraints.lightness
-    ok = (L >= lo) & (L <= hi) & in_gamut(cand_lab)
+    linear = srgb_to_linear(cand / 255.0)
+    cand_lab = linear_srgb_to_oklab(linear)
+    y = relative_luminance(linear)
+    lo, hi = constraints.luminance_range
+    ok = (y >= lo - 1e-12) & (y <= hi + 1e-12)
     dist = np.linalg.norm(cand_lab - lab[:, None, :], axis=-1)
     best = np.argmin(np.where(ok, dist, np.inf), axis=1)
     chosen = cand[np.arange(len(lab)), best]

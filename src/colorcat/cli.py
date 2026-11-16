@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 from collections.abc import Sequence
 
+from ._constraints import DEFAULT_MIN_CONTRAST
 from ._cvd import CVD_TYPES
 from ._format import FORMATS
 from .palette import palette
@@ -22,6 +23,13 @@ def main(argv: Sequence[str] | None = None) -> int:
     )
     parser.add_argument("n", type=int, help="number of colors")
     parser.add_argument("--background", choices=["white", "black"], default="white")
+    parser.add_argument(
+        "--min-contrast",
+        type=float,
+        default=DEFAULT_MIN_CONTRAST,
+        metavar="RATIO",
+        help="minimum WCAG contrast ratio with the background (default: %(default)s)",
+    )
     parser.add_argument("--restarts", type=int, default=4, metavar="N", help="restart_count")
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--exclude", nargs="+", default=[], metavar="HEX", help="colors to avoid")
@@ -35,6 +43,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         colors = palette(
             args.n,
             background=args.background,
+            min_contrast=args.min_contrast,
             restart_count=args.restarts,
             seed=args.seed,
             exclude=args.exclude,

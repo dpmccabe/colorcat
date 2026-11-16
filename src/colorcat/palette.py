@@ -9,7 +9,7 @@ from typing import Literal
 
 import numpy as np
 
-from ._constraints import get_constraints
+from ._constraints import DEFAULT_MIN_CONTRAST, get_constraints
 from ._cvd import CvdType, normalize_cvd
 from ._distance import min_pairwise_distance, pairwise_distance
 from ._energy import optimize
@@ -41,10 +41,10 @@ def _parse_colors(colors: Sequence[str], name: str) -> Array:
         raise ValueError(f"{name}: {err}") from None
 
 
-def _farthest_first(lab: Array, background: Array, cvd: tuple[str, ...]) -> np.ndarray:
-    """Order colors so the first is farthest from the background, then greedily farthest apart."""
+def _farthest_first(lab: Array, references: Array, cvd: tuple[str, ...]) -> np.ndarray:
+    """Order colors so the first is farthest from the background and its opposite, then greedily farthest apart."""
     n = len(lab)
-    order = [int(np.argmax(pairwise_distance(lab, background[None, :], cvd)[:, 0]))]
+    order = [int(np.argmax(pairwise_distance(lab, references, cvd).min(axis=1)))]
     d = pairwise_distance(lab, lab[order], cvd)[:, 0]
     while len(order) < n:
         d[order] = -1.0
@@ -58,6 +58,7 @@ def palette(
     n: int,
     *,
     background: Literal["white", "black"] = "white",
+    min_contrast: float = DEFAULT_MIN_CONTRAST,
     restart_count: int = 4,
     exclude: Sequence[str] = (),
     fixed: Sequence[str] = (),
@@ -68,12 +69,19 @@ def palette(
     """Return ``n`` maximally distinct colors, by default as ``"#rrggbb"`` strings.
 
     The colors are chosen to maximize the smallest perceptual (OKLab) distance
-    between any two of them and between each of them and the background.
+    between any two of them and between each of them and the background and its
+    opposite (black on white, white on black), where lines and text are usually drawn.
 
     Args:
         n: Number of colors (``>= 0``).
         background: ``"white"`` or ``"black"``, the color the palette will be
-            drawn on. It selects a suitable lightness range.
+            drawn on.
+        min_contrast: Minimum WCAG contrast ratio (1 to 15) between every color and
+            the background, ``(Y_light + 0.05) / (Y_dark + 0.05)`` on relative
+            luminance. The default, 3, is the WCAG minimum for graphical objects
+            such as chart marks; use 4.5 for text. Higher values leave fewer, darker
+            (on white) or lighter (on black) colors to choose from, so the distance
+            between the closest colors drops.
         restart_count: Number of independent optimization restarts (``>= 1``).
             Each restart also refines its result with a number of basin-hopping
             moves. More restarts never give a worse palette, but take longer.
@@ -102,7 +110,7 @@ def palette(
     restart_count = _as_int(restart_count, "restart_count", 1)
     if seed is not None:
         seed = _as_int(seed, "seed", 0)
-    constraints = get_constraints(background)
+    constraints = get_constraints(background, min_contrast)
     cvd_views = normalize_cvd(cvd)
     if color_format not in FORMATS:
         raise ValueError(
@@ -112,7 +120,7 @@ def palette(
     if n == 0:
         return []
 
-    anchors = np.concatenate([constraints.background_lab[None, :], extra])
+    anchors = np.concatenate([constraints.reference_labs, extra])
     result = optimize(seed, n, constraints, anchors, restart_count, cvd_views)
     if result.min_distance < LOW_DISTANCE_WARNING:
         warnings.warn(
@@ -121,7 +129,7 @@ def palette(
             "they may be hard to tell apart",
             stacklevel=2,
         )
-    order = _farthest_first(result.lab, constraints.background_lab, cvd_views)
+    order = _farthest_first(result.lab, constraints.reference_labs, cvd_views)
     return format_colors(result.rgb8[order], color_format)
 
 

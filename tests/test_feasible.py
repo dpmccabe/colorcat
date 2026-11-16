@@ -2,17 +2,22 @@ import numpy as np
 import pytest
 
 from colorcat._constraints import get_constraints
-from colorcat._feasible import _max_chroma, gamut_max_chroma, project, sample
-from colorcat._oklab import in_gamut, oklab_to_oklch, oklch_to_oklab, srgb_to_oklab
+from colorcat._feasible import _max_chroma, gamut_max_chroma, is_feasible, project, sample
+from colorcat._oklab import (
+    in_gamut,
+    oklab_to_linear_srgb,
+    oklab_to_oklch,
+    oklch_to_oklab,
+    relative_luminance,
+    srgb_to_oklab,
+)
 
 BACKGROUNDS = ["white", "black"]
 RNG = np.random.default_rng(3)
 
 
 def feasible(lab, c, tol=1e-9):
-    L = oklab_to_oklch(lab)[..., 0]
-    lo, hi = c.lightness_bounds
-    return (L >= lo - tol) & (L <= hi + tol) & in_gamut(lab)
+    return is_feasible(lab, c, tol)
 
 
 def test_gamut_max_chroma_is_the_boundary():
@@ -67,17 +72,27 @@ def test_project_handles_greys_and_extremes(name):
     assert feasible(out, c).all()
 
 
-def test_project_keeps_hue_and_works_with_any_leading_shape():
+def test_project_works_with_any_leading_shape():
     c = get_constraints("white")
     pts = oklch_to_oklab(np.array([[[0.9, 0.3, 120.0], [0.1, 0.01, 200.0]]]))
     out = project(pts, c)
     assert out.shape == (1, 2, 3)
-    np.testing.assert_allclose(oklab_to_oklch(out)[..., 2], [[120.0, 200.0]], atol=1e-6)
+    assert feasible(out, c).all()
+
+
+def test_project_moves_a_too_bright_color_only_as_far_as_needed():
+    c = get_constraints("white")
+    _, hi = c.luminance_bounds
+    y = relative_luminance(oklab_to_linear_srgb(project(srgb_to_oklab([[0.9, 0.9, 0.2]]), c)))
+    assert y[0] == pytest.approx(hi, abs=1e-9)
+    # A color that already satisfies the contrast is not touched.
+    dark = srgb_to_oklab([[0.1, 0.2, 0.5]])
+    np.testing.assert_allclose(project(dark, c), dark, atol=1e-9)
 
 
 @pytest.mark.parametrize("name", BACKGROUNDS)
-def test_project_clamps_into_band_for_dense_hues(name):
-    # Dense sweep over hue and lightness, near the edges where the gamut bites.
+def test_project_is_feasible_for_dense_hues(name):
+    # Dense sweep over hue and lightness, including far outside the gamut.
     c = get_constraints(name)
     L, h = np.meshgrid(np.linspace(-0.1, 1.1, 120), np.linspace(0, 360, 721))
     lch = np.stack([L, np.full_like(L, 0.25), h], axis=-1).reshape(-1, 3)
@@ -106,9 +121,16 @@ def test_sample_is_deterministic_and_handles_small_k():
 
 
 def test_max_chroma_is_cached_and_positive():
-    c = get_constraints("black")
-    assert _max_chroma(c) > 0.1
-    assert _max_chroma.cache_info().hits >= 0
+    assert _max_chroma() > 0.1
     before = _max_chroma.cache_info().hits
-    _max_chroma(c)
+    _max_chroma()
     assert _max_chroma.cache_info().hits == before + 1
+
+
+@pytest.mark.parametrize("name", BACKGROUNDS)
+@pytest.mark.parametrize("ratio", [1.0, 4.5, 7.0, 12.0])
+def test_project_and_sample_follow_min_contrast(name, ratio):
+    c = get_constraints(name, ratio)
+    pts = RNG.uniform([-0.5, -0.6, -0.6], [1.5, 0.6, 0.6], size=(2000, 3))
+    assert feasible(project(pts, c), c).all()
+    assert feasible(sample(np.random.default_rng(2), 500, c), c).all()

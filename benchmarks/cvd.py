@@ -42,7 +42,7 @@ def subsets():
 def view_distances(colors: list[str], background: str) -> dict[str, float]:
     """Smallest pairwise ΔE_OK (with the background) in each single view."""
     lab = np.array([hex_to_oklab(c) for c in colors])
-    bg = get_constraints(background).background_lab[None, :]
+    bg = get_constraints(background).reference_labs
     return {v: min_distance_with_anchors(lab, bg, () if v == "normal" else (v,)) for v in VIEWS}
 
 

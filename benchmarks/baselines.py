@@ -40,10 +40,10 @@ NAMED = {
 }
 
 
-def named_min_distance(name: str, n: int, background_lab: np.ndarray) -> float:
+def named_min_distance(name: str, n: int, references: np.ndarray) -> float:
     """Min ΔE_OK (incl. background) of the first ``n`` colors of a named palette."""
     lab = np.array([hex_to_oklab(c) for c in NAMED[name][:n]])
-    return min_distance_with_anchors(lab, background_lab[None, :])
+    return min_distance_with_anchors(lab, references)
 
 
 def random_min_distance(n: int, c: Constraints, draws: int = 50, seed: int = 0) -> float:
@@ -52,20 +52,20 @@ def random_min_distance(n: int, c: Constraints, draws: int = 50, seed: int = 0) 
     scores = []
     for _ in range(draws):
         lab = srgb_to_oklab(quantize(sample(rng, n, c), c) / 255.0)
-        scores.append(min_distance_with_anchors(lab, c.background_lab[None, :]))
+        scores.append(min_distance_with_anchors(lab, c.reference_labs))
     return float(np.median(scores))
 
 
 def farthest_point_min_distance(
     n: int, c: Constraints, candidates: int = 20000, seed: int = 0
 ) -> float:
-    """Greedy farthest-point sampling from the background over random feasible candidates."""
+    """Greedy farthest-point sampling from the background and its opposite over random feasible candidates."""
     rng = np.random.default_rng(seed)
     cand = srgb_to_oklab(quantize(sample(rng, candidates, c), c) / 255.0)
     chosen = []
-    nearest = pairwise_distance(cand, c.background_lab[None, :])[:, 0]
+    nearest = pairwise_distance(cand, c.reference_labs).min(axis=1)
     for _ in range(n):
         i = int(np.argmax(nearest))
         chosen.append(i)
         nearest = np.minimum(nearest, pairwise_distance(cand, cand[[i]])[:, 0])
-    return min_distance_with_anchors(cand[chosen], c.background_lab[None, :])
+    return min_distance_with_anchors(cand[chosen], c.reference_labs)

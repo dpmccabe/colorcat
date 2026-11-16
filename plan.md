@@ -6,7 +6,7 @@ A Python package exposing `palette(n, ...)`, which returns `n` maximally distinc
 
 Choose `n` colors in a perceptually uniform space so that the *collective* set is as mutually distinct as possible. Each `n` gets its own optimization: quality of the palette *for that n* matters more than consistency between palettes of different sizes.
 
-v1 is deliberately small: the user picks a `white` or `black` background, and the package picks good lightness/chroma/hue ranges and optimizer settings itself. Everything tunable is hard-coded until there is evidence for exposing it (see v2).
+v1 is deliberately small: the user picks a `white` or `black` background, and the package enforces a WCAG contrast ratio against it (default 3:1, `min_contrast`) and picks the optimizer settings itself. Everything tunable is hard-coded until there is evidence for exposing it (see v2).
 
 ## Scope by version
 
@@ -22,7 +22,7 @@ v1 is deliberately small: the user picks a `white` or `black` background, and th
 | Farthest-point sampling (`method="farthest"`) | | ✅ |
 | Maximin refinement (discrete local search) | | ✅ |
 | `method=` argument | | ✅ (no choice to make in v1) |
-| `min_background_contrast` (WCAG contrast ratio) | | ✅ |
+| `min_contrast` (WCAG contrast ratio with the background) | ✅ | |
 | `cvd=` (color-vision-deficiency awareness) | ✅ (added after v1) | ✅ |
 
 ## Public API (v1)
@@ -41,12 +41,12 @@ def palette(
 ```
 
 Design notes:
-- **Typical use is `palette(n)` or `palette(n, background="black")` and nothing else.** There are no lightness/chroma/hue arguments in v1; the ranges are chosen by the package (see "Built-in color ranges").
+- **Typical use is `palette(n)` or `palette(n, background="black")` and nothing else.** There are no lightness/chroma/hue arguments in v1; the only range is the contrast requirement `min_contrast` (see "Built-in color ranges").
 - **`restart_count`** (default **4**; each restart is followed by `HOP_COUNT=16` basin-hopping moves, see Algorithm. At roughly equal runtime, 4 restarts x 16 hops beat 32 plain restarts by about 1-3% min distance. It was 32 before hopping was added.) is the number of independent optimization runs; the best result is kept. Rationale for 32 (raised from an initial 16 after `benchmarks/tune.py`, which showed about +2.5% min distance for ~1.6x the time): the energy landscape has many local optima and restarts are the main quality lever, restarts are cheap for typical `n` (and vectorizable as a batch dimension), and the quality gain flattens out past roughly this point. The default is confirmed or adjusted by the benchmark (milestone 4) so that typical `n` stays under about a second. Validated as an integer ≥ 1.
 - **Each `n` is optimized independently.** The best 4-color palette can look quite different from the best 14-color one. There is no prefix stability: `palette(4)` is not `palette(14)[:4]`, and no first color is pinned.
 - **The seed controls all randomness and nothing else.** The only random choices are the starting positions of the restarts. Restart `i` draws its start from its own child stream, `SeedSequence(seed).spawn(restart_count)[i]`, so a restart's result does not depend on `restart_count`, and **raising `restart_count` can never make a palette worse** (the extra restarts only add candidates). Same arguments + same seed always returns the identical palette (reproducible charts); a different seed may converge to a different, similarly good palette. `seed=None` draws fresh entropy. The default is `0`.
-- **Output order:** the optimizer returns an unordered set; it is then ordered farthest-first, starting with the color most distant from the background, so adjacent legend entries are not near-duplicates and the first series gets the strongest contrast. Order is not a stability guarantee across `n`.
-- **Reserved for v2:** `lightness`, `chroma`, `hue`, other background colors, `method=`, `min_background_contrast`, `cvd`. v1 does not accept them, but the internals are built so they slot in without an API break (the constraint set is already a data object, see `_constraints.py`).
+- **Output order:** the optimizer returns an unordered set; it is then ordered farthest-first, starting with the color most distant from the background and its opposite, so adjacent legend entries are not near-duplicates and the first series gets the strongest contrast. Order is not a stability guarantee across `n`.
+- **Reserved for v2:** `lightness`, `chroma`, `hue`, other background colors, `method=`. v1 does not accept them, but the internals are built so they slot in without an API break (the constraint set is already a data object, see `_constraints.py`).
 - Validate: `n >= 0` (integer), `background` is exactly `"white"` or `"black"` (anything else raises `ValueError` listing the allowed values), `restart_count >= 1`, `fixed`/`exclude` parse as hex colors. Warn (don't fail) if the achieved min distance is very low (e.g. very large `n`).
 - `n=0` returns `[]`. `n=1` works naturally (the one color is repelled only by the anchors).
 - Companion helper: `min_distance(colors) -> float` (ΔE_OK of the closest pair) to quantify quality.
@@ -71,31 +71,32 @@ Distance metric: Euclidean in OKLab (ΔE_OK). It is also what makes the energy m
 
 | | `"white"` | `"black"` |
 |---|---|---|
-| Lightness (OKLab L) | 0.40 – 0.75 | 0.60 – 0.90 |
+| Contrast with background (WCAG) | ≥ `min_contrast` (default 3:1): relative luminance `Y ≤ 0.30` | ≥ `min_contrast`: `Y ≥ 0.10` |
 | Chroma (OKLCh C) | no bounds; limited only by the sRGB gamut | same |
 | Hue | 0° – 360° (full circle) | same |
 
-- **Lightness:** the band sits on the opposite side of mid-grey from the background so marks always read clearly. On white, the upper bound keeps colors clearly darker than the background and the lower bound avoids near-black marks that read as text or axes. On black it is mirrored.
+- **Contrast:** the required WCAG contrast ratio `(Y_light + 0.05) / (Y_dark + 0.05)` on relative luminance (default 3, the WCAG 1.4.11 bar for graphical objects; 4.5 for text) is a one-sided bound on `Y`: `Y <= (Yb + 0.05)/r - 0.05` on a light background, `Y >= r (Yb + 0.05) - 0.05` on a dark one. It replaces the earlier OKLab lightness band. A lightness band was tuned first (`benchmarks/lightness.py`, since removed) but, once the opposite color is also repelled, it only duplicated what the optimizer already does and gave no principled meaning to `background`. Higher ratios shrink the feasible region and the achievable minimum distance (n=8 on white, mean of 3 seeds: 0.305 at 1:1, 0.277 at 3:1, 0.245 at 4.5:1, 0.210 at 7:1). `min_contrast` is validated to lie in [1, 15].
 - **Chroma, no bounds:** there is no chroma floor or ceiling; the sRGB gamut at each (L, h) is the only limit. (An earlier 0.09 floor was removed: maximizing the minimum distance already pushes colors toward the gamut surface, so greys are rare except at large `n`, and the floor rarely bound.)
 - **Full hue circle:** nothing is excluded by default.
 - **These numbers are starting values**, to be tuned visually (swatch strips on white and black) during milestone 2. Because users cannot override them in v1, getting them right matters; they live in one place so they are easy to change.
 
-**Background in the objective.** The background color is a fixed (non-movable) repeller alongside `fixed` and `exclude` colors, so every chosen color is pushed away from the background as strongly as it is from the other colors. Together with the lightness band, this keeps marks visible without a separate contrast rule. (A WCAG contrast-ratio option is deferred to v2; see below.)
+**Background and its opposite in the objective.** The background color and its opposite (black on white, white on black, where plot lines, axes and text are drawn) are fixed (non-movable) repellers alongside `fixed` and `exclude` colors, so every chosen color is pushed away from the background as strongly as it is from the other colors. The opposite color is a repeller only; it carries no contrast requirement of its own. The contrast with the background is a hard constraint (see below).
 
 If `fixed` colors lie outside the built-in ranges, that is allowed: they are anchors and are never moved or validated against the ranges.
 
 ## Feasible region
 
-The feasible set is the intersection of {L range} × × {hue range} × {sRGB gamut} for the selected background, with a small inset margin (0.002 on each L bound and on the gamut ceiling) so colors still satisfy the constraints after 8-bit quantization.
+The feasible set is the intersection of {sRGB gamut} and {relative luminance slab `lo <= Y <= hi` from `min_contrast`}, with a small inset margin (0.002 on the luminance bound) so colors still satisfy the contrast requirement after 8-bit quantization. In linear sRGB both are convex (a cube cut by a half-space), which makes projection exact. Final colors are snapped to 8-bit sRGB by searching the 27 lattice neighbours for the nearest one that still meets the contrast exactly.
 
-`_feasible.py` provides three operations on it, all vectorized NumPy:
+`_feasible.py` provides these operations on it, all vectorized NumPy:
 - **`gamut_max_chroma(L, h)`:** the largest in-gamut chroma at a given lightness and hue, found by vectorized bisection on chroma (convert to linear sRGB, test 0–1 bounds). Can be tabulated on a coarse (L, h) grid and interpolated if profiling says so.
-- **`project(points)`:** map arbitrary OKLab points onto the feasible region. Clip L to the band; convert to (C, h); clamp C into `[0, gamut_max_chroma(L, h)]`. Must be idempotent (tested). (Hue-window clamping with wraparound is added in v2 along with the `hue` override.)
-- **`sample(rng, k)`:** draw `k` uniformly distributed feasible points (rejection sampling in OKLCh).
+- **`project(points)`:** map arbitrary OKLab points onto the feasible region: the exact Euclidean projection in linear sRGB onto the cube intersected with the luminance slab, `clip(z - lam * w, 0, 1)` for the luminance weights `w` and a scalar `lam` found by vectorized bisection (`lam = 0` for points already feasible). Idempotent (tested). It does not preserve hue, unlike the earlier L-band/chroma clip; it matched or beat that projection's min distance in the benchmark (n = 5, 8, 13 at 1:1: 0.348, 0.305, 0.241 vs 0.334, 0.288, 0.228).
+- **`is_feasible(points)`:** membership test used by tests.
+- **`sample(rng, k)`:** draw `k` feasible points by rejection sampling in OKLCh over the full lightness range, keeping those in gamut with the required contrast.
 
 ## Algorithm (v1): energy minimization with restarts
 
-Colors are `n` free particles in OKLab (3 coordinates each), repelled from one another and from fixed anchors (`background`, `exclude`, `fixed`), confined to the feasible region.
+Colors are `n` free particles in OKLab (3 coordinates each), repelled from one another and from fixed anchors (`background`, its opposite, `exclude`, `fixed`), confined to the feasible region.
 
 **Objective.** A smooth surrogate for maximin (maximize the minimum pairwise distance). With `d_ij` the ΔE_OK between particles (and anchors), minimize the log-domain Riesz energy
 
@@ -144,7 +145,7 @@ computed with `logsumexp` for numerical stability. As `p → ∞`, minimizing `E
 
 ### User-tunable constraints and arbitrary backgrounds
 - Add `lightness`, `chroma` and `hue` overrides (each `None` → built-in default), replacing only their own value. Hue-window clamping with wraparound joins `project`.
-- Allow arbitrary `background` colors (hex or sRGB tuple). Ranges are then *derived* from the background's OKLab lightness by the same logic as the built-in table: light backgrounds → darker band, dark backgrounds → lighter band, and a mid-tone background (roughly 0.45 < L_bg < 0.65, placeholder cutoffs) **raises `ValueError`** telling the user to pass `lightness` explicitly. `"white"` / `"black"` remain valid shorthand.
+- Allow arbitrary `background` colors (hex or sRGB tuple). `min_contrast` already works on any background's luminance (`Constraints.luminance_range`); what remains is deciding the "opposite" color that is repelled alongside it, and what to do for mid-tone backgrounds, where the allowed luminance region on either side can be tiny. `"white"` / `"black"` remain valid shorthand.
 - Infeasible or too-tight combinations raise a `ValueError` naming the constraints involved; merely cramped ones warn.
 - Expose a `resolve_constraints(background, ...)` helper that shows the resolved values.
 
@@ -164,9 +165,6 @@ Exposed via a new `method: Literal["energy", "farthest", "maximin"]` argument, w
 - The objective's distance becomes `d(a, b) = min over views v ∈ {normal} ∪ cvd of ΔE_OK(sim_v(a), sim_v(b))`, i.e. a pair only counts as distinct if it is distinct under every requested view. The energy objective stays smooth enough (min over a few views, or a soft-min), but the analytic gradients must account for which view is active.
 - Expect a tradeoff: larger `n` cannot be fully CVD-safe, so the achieved `min_distance` will drop as views are added; `min_distance` should accept the same `cvd` argument so users can see the cost.
 - **v1 preparations so this is cheap to add:** (1) put distance behind a single internal function `_pairwise_distance(a, b)` used by the objective and the helpers (no inlined `np.linalg.norm`), with a matching gradient function next to it; (2) keep particles and anchors in OKLab arrays and convert only at the edges; (3) keep `cvd` in the cache key (always `None` in v1).
-
-### `min_background_contrast` (WCAG)
-Deferred. A possible v2 argument: a WCAG 2.x contrast-ratio threshold (e.g. 3:1, the WCAG 1.4.11 bar for non-text marks) applied on exact relative luminance, as an additional feasibility constraint in `_feasible.py` (in `project`, it would clip or move points along L). The concern is how it interacts with `lightness` and `chroma`: both would constrain the same region, so an explicit lightness could make the contrast threshold unreachable (or silently redundant), and the derived lightness band would need to be derived jointly with it. Before adding it, decide the precedence rules (e.g. explicit values intersect and an empty result raises a clear error; `0` disables the filter) and whether the derived L band should be computed from the contrast target. Sensibly designed together with the "user-tunable constraints" item above.
 
 ### Other options considered (not planned)
 - **K-means / Lloyd (CVT) on the gamut:** produces *evenly covering* colors rather than maximally separated ones; centroids sit in the interior and have lower chroma. Useful as a contrast, not the goal.
@@ -206,7 +204,7 @@ Housekeeping: fix `pyproject.toml` description; remove the placeholder `colorcat
 - **Objective:** analytic gradient matches finite differences; energy is non-increasing across accepted steps; as `p` grows, `E_p` tracks the true minimum distance.
 - **Feasible region:** `project` is idempotent and always returns feasible points, including near the band edges; `sample` points are all feasible.
 - **Argument validation:** `background` other than `"white"`/`"black"` raises; `restart_count < 1` or non-integer raises; bad hex in `fixed`/`exclude` raises; `n=0` → `[]`.
-- **Built-in ranges:** white → outputs in the lower, darker L band; black → upper, lighter band; every output color lies inside the documented L/C ranges (within a quantization tolerance) and inside sRGB. Visual review: render swatch strips on white and black while tuning the ranges.
+- **Contrast:** every output color has at least `min_contrast` WCAG contrast with the background (checked on the 8-bit values, exactly), for several ratios on both backgrounds; higher ratios give a smaller minimum distance; `min_contrast` outside [1, 15] raises.
 - **Anchors:** `fixed` colors are never re-selected or moved; chosen colors keep distance from `exclude` colors and the background at least comparable to their distance from each other.
 - **Properties:** same args + same seed → identical output (across repeated calls and fresh processes); `restart_count=k+m` is never worse than `restart_count=k` for the same seed (nested child streams); different seeds can differ but stay within a small tolerance of each other's min distance; `len == n`; no duplicates after quantization; n=0/1/2 edge cases. Explicitly *not* tested: any relationship between `palette(k)` and `palette(n)`.
 - **Quality:** for n in {2…30}, on white and black backgrounds, min pairwise ΔE_OK (after quantization) of `palette` ≥ random sampling from the same feasible region (median of many draws), ≥ a greedy farthest-point baseline implemented in the benchmark script, and comparable to or better than named palettes at the same n. Track results, runtime, and variance across seeds in a benchmark script; use it to confirm the `restart_count=32` default and the hyperparameter constants.
@@ -220,7 +218,7 @@ Housekeeping: fix `pyproject.toml` description; remove the placeholder `colorcat
 4. **Energy optimizer:** objective + gradient, projected descent, hyperparameter constants, restarts, seeding; `palette()` end to end with hex output; `min_distance`; benchmark vs random, farthest-point baseline and named palettes; confirm `restart_count` default and tune constants.
 5. **Extras:** `fixed`, `exclude`, output formats, ordering, CLI.
 6. **Docs & release (v1):** README with swatch gallery, API docs, versioning.
-7. **v2:** user-tunable `lightness`/`chroma`/`hue` and arbitrary backgrounds (mid-tone error); `method=` with farthest-point sampling and maximin refinement; `cvd=`; WCAG `min_background_contrast`; optional CIEDE2000/CAM16 evaluation metric; optional output ordering modes (e.g. sort by hue).
+7. **v2:** user-tunable `lightness`/`chroma`/`hue` and arbitrary backgrounds; `method=` with farthest-point sampling and maximin refinement; optional CIEDE2000/CAM16 evaluation metric; optional output ordering modes (e.g. sort by hue).
 
 ## Open questions
 
@@ -232,11 +230,11 @@ Housekeeping: fix `pyproject.toml` description; remove the placeholder `colorcat
 - `seed` defaults to `0`; it chooses restart starts.
 - No chroma floor (an earlier 0.09 floor was removed); greys are not excluded, though the optimizer rarely picks them.
 - Minimum Python version is 3.12.
-- **`background` is `"white"` or `"black"` only in v1** and selects hard-coded lightness/chroma/hue ranges; no range overrides in v1.
+- **`background` is `"white"` or `"black"` only in v1** and sets the contrast reference; the only user-set range in v1 is `min_contrast`.
 - **`restart_count` is the one exposed tuning argument** (default 4). All other optimizer hyperparameters are hard-coded constants.
 - No pinned first color; the color farthest from the background only determines output ordering.
-- Mid-tone backgrounds (v2, with arbitrary backgrounds) raise an error unless `lightness` is given explicitly.
-- WCAG contrast (`min_background_contrast`) is deferred to v2.
+- Mid-tone backgrounds (v2, with arbitrary backgrounds): contrast with a mid-tone background is feasible only in a narrow range of luminance on each side, so v2 needs to decide what to do when the allowed region is tiny.
+- WCAG contrast is implemented in v1 as `min_contrast` (default 3:1) against the background only; the opposite color is a repeller, not a constraint.
 - **v1 algorithm is energy minimization** (NumPy-only projected gradient descent with restarts), chosen because per-`n` optimality matters more than speed or prefix stability. Farthest-point sampling and maximin refinement are kept as v2 options.
 - Each `n` is optimized independently; no prefix stability.
 - NumPy is the only runtime dependency; CVD awareness is a v2 option.

@@ -84,6 +84,21 @@ def oklab_to_linear_srgb(lab: ArrayLike) -> Array:
     return lms @ _M1_INV.T
 
 
+# Rows of the linear-sRGB -> CIE Y map: relative luminance as defined by WCAG.
+LUMINANCE_WEIGHTS = np.array([0.2126, 0.7152, 0.0722])
+
+
+def relative_luminance(linear: ArrayLike) -> Array:
+    """WCAG relative luminance ``Y`` of linear sRGB ``(..., 3)``: 0 for black, 1 for white."""
+    return _as_float(linear) @ LUMINANCE_WEIGHTS
+
+
+def contrast_ratio(y1: ArrayLike, y2: ArrayLike) -> Array:
+    """WCAG contrast ratio ``(Y_light + 0.05) / (Y_dark + 0.05)`` of two luminances (1 to 21)."""
+    a, b = _as_float(y1), _as_float(y2)
+    return (np.maximum(a, b) + 0.05) / (np.minimum(a, b) + 0.05)
+
+
 def srgb_to_oklab(srgb: ArrayLike) -> Array:
     """sRGB ``(..., 3)`` in ``[0, 1]`` -> OKLab."""
     return linear_srgb_to_oklab(srgb_to_linear(srgb))

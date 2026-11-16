@@ -6,8 +6,9 @@ import pytest
 import colorcat
 from colorcat import min_distance, palette
 from colorcat._constraints import get_constraints
-from colorcat._format import hex_to_oklab
-from colorcat._oklab import oklab_to_oklch
+from colorcat._distance import pairwise_distance
+from colorcat._format import hex_to_oklab, hex_to_srgb
+from colorcat._oklab import contrast_ratio, oklab_to_oklch, relative_luminance, srgb_to_linear
 
 HEX = r"#[0-9a-f]{6}"
 
@@ -42,23 +43,40 @@ def test_numpy_integers_are_accepted():
 
 
 @pytest.mark.parametrize("background", ["white", "black"])
-def test_colors_respect_the_built_in_lightness_range(background):
-    c = get_constraints(background)
-    L = lch(palette(15, background=background, restart_count=2))[:, 0]
-    assert (L >= c.lightness[0]).all() and (L <= c.lightness[1]).all()
+@pytest.mark.parametrize("ratio", [1.0, 3.0, 4.5, 7.0])
+def test_colors_meet_the_min_contrast(background, ratio):
+    colors = palette(10, background=background, min_contrast=ratio, restart_count=2)
+    y = relative_luminance(srgb_to_linear(np.array([hex_to_srgb(c) for c in colors])))
+    yb = 1.0 if background == "white" else 0.0
+    assert (contrast_ratio(y, yb) >= ratio - 1e-9).all()
 
 
-def test_background_picks_light_or_dark_band():
+def test_default_min_contrast_is_wcag_graphical_objects():
+    assert palette(5, restart_count=1) == palette(5, min_contrast=3, restart_count=1)
+
+
+def test_higher_contrast_costs_distance():
+    low = min_distance(palette(8, min_contrast=1.5, restart_count=2))
+    high = min_distance(palette(8, min_contrast=7.0, restart_count=2))
+    assert high < low
+
+
+@pytest.mark.parametrize("bad", [0.5, 16, float("nan")])
+def test_invalid_min_contrast_raises(bad):
+    with pytest.raises(ValueError, match="min_contrast"):
+        palette(3, min_contrast=bad)
+
+
+def test_background_picks_light_or_dark_colors():
     on_white = lch(palette(8, background="white", restart_count=2))[:, 0]
     on_black = lch(palette(8, background="black", restart_count=2))[:, 0]
-    assert on_white.max() <= 0.75 < 0.6 + 0.2 and on_black.min() >= 0.6
     assert on_white.mean() < on_black.mean()
 
 
-def test_first_color_is_farthest_from_background():
+def test_first_color_is_farthest_from_background_and_its_opposite():
     colors = palette(7, restart_count=2)
     lab = np.array([hex_to_oklab(c) for c in colors])
-    d = np.linalg.norm(lab - np.array([1.0, 0.0, 0.0]), axis=1)
+    d = pairwise_distance(lab, get_constraints("white").reference_labs).min(axis=1)
     assert np.argmax(d) == 0
 
 
@@ -109,3 +127,14 @@ def test_no_warning_for_normal_palettes():
     with warnings.catch_warnings():
         warnings.simplefilter("error")
         palette(8, restart_count=2)
+
+
+@pytest.mark.parametrize("background", ["white", "black"])
+def test_colors_stay_distinct_from_background_and_its_opposite(background):
+    c = get_constraints(background)
+    lab = np.array([hex_to_oklab(h) for h in palette(3, background=background, restart_count=2)])
+    d = pairwise_distance(lab, c.reference_labs)
+    # With 3 colors the closest pair is about 0.4 apart, so neither the background
+    # nor its opposite (plot lines, text) may be much closer than that.
+    assert d[:, 0].min() > 0.3
+    assert d[:, 1].min() > 0.3

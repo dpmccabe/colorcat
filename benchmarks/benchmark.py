@@ -24,7 +24,7 @@ from colorcat._format import hex_to_oklab
 
 
 def score(colors: list[str], bg: np.ndarray) -> float:
-    return min_distance_with_anchors(np.array([hex_to_oklab(c) for c in colors]), bg[None, :])
+    return min_distance_with_anchors(np.array([hex_to_oklab(c) for c in colors]), bg)
 
 
 def main() -> None:
@@ -44,18 +44,18 @@ def main() -> None:
         for n in list(range(2, 13)) + list(range(14, args.max_n + 1, 2)):
             t = time.perf_counter()
             main_score = score(
-                palette(n, background=background, restart_count=args.restarts), c.background_lab
+                palette(n, background=background, restart_count=args.restarts), c.reference_labs
             )
             sec = time.perf_counter() - t
             seeds = [
                 score(
                     palette(n, background=background, restart_count=args.restarts, seed=s),
-                    c.background_lab,
+                    c.reference_labs,
                 )
                 for s in range(1, args.seeds + 1)
             ]
             named = " ".join(
-                f"{k}={named_min_distance(k, n, c.background_lab):.3f}"
+                f"{k}={named_min_distance(k, n, c.reference_labs):.3f}"
                 for k in NAMED
                 if n <= len(NAMED[k])
             )

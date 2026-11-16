@@ -17,7 +17,7 @@ from colorcat._format import hex_to_oklab
 
 def score(colors, c):
     lab = np.array([hex_to_oklab(x) for x in colors])
-    return min_distance_with_anchors(lab, c.background_lab[None, :])
+    return min_distance_with_anchors(lab, c.reference_labs)
 
 
 @pytest.mark.parametrize("background", ["white", "black"])
@@ -32,7 +32,7 @@ def test_beats_random_and_farthest_point_baselines(background, n):
 @pytest.mark.parametrize("name, n", [("okabe-ito", 7), ("tableau10", 10)])
 def test_beats_named_palettes_on_white(name, n):
     c = get_constraints("white")
-    assert score(palette(n), c) >= named_min_distance(name, n, c.background_lab)
+    assert score(palette(n), c) >= named_min_distance(name, n, c.reference_labs)
 
 
 def test_distance_falls_as_n_grows_roughly_monotonically():

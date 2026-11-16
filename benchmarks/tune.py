@@ -10,7 +10,7 @@ default's score on that case. The report gives, per candidate, the mean of that
 ratio (>100% = better than current), its standard error, wins/ties/losses, and
 the mean runtime relative to the current defaults.
 
-The built-in L bands are NOT swept: changing them changes the
+The contrast requirement (``min_contrast``) is NOT swept: changing it changes the
 feasible set, so min-distance scores would not be comparable.
 
 Candidates are applied by overriding the constants in ``colorcat._energy`` inside
@@ -90,7 +90,7 @@ def run_case(overrides: dict, case: Case) -> tuple[float, float]:
         for k, v in saved.items():
             setattr(_energy, k, v)
     lab = np.array([hex_to_oklab(c) for c in colors])
-    bg = get_constraints(background).background_lab[None, :]
+    bg = get_constraints(background).reference_labs
     return min_distance_with_anchors(lab, bg), sec
 
 
