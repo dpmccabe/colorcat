@@ -13,12 +13,16 @@ from ._constraints import DEFAULT_MIN_CONTRAST, get_constraints
 from ._cvd import CvdType, normalize_cvd
 from ._distance import min_pairwise_distance, pairwise_distance
 from ._energy import optimize
-from ._format import FORMATS, format_colors, hex_to_oklab
+from ._format import FORMATS, format_colors, hex_to_oklab, hex_to_srgb
 from ._oklab import Array
+from ._presets import preset_palette
 
 # Below this ΔE_OK the closest pair is hard to tell apart (a just-noticeable
 # difference is about 0.02), so we warn.
 LOW_DISTANCE_WARNING = 0.03
+
+# The seed whose results are saved in ``presets.json``.
+DEFAULT_SEED = 0
 
 
 def _as_int(value: object, name: str, minimum: int) -> int:
@@ -64,7 +68,7 @@ def palette(
     fixed: Sequence[str] = (),
     cvd: Sequence[CvdType] | CvdType = (),
     color_format: Literal["hex", "rgb", "oklab", "oklch"] = "hex",
-    seed: int | None = 0,
+    seed: int | None = DEFAULT_SEED,
 ) -> list:
     """Return ``n`` maximally distinct colors, by default as ``"#rrggbb"`` strings.
 
@@ -102,6 +106,10 @@ def palette(
         seed: Seed for the random starting points. The same arguments and seed
             always return the same palette. ``None`` uses fresh entropy.
 
+    With the default ``min_contrast`` and ``seed`` and no ``exclude``, ``fixed`` or
+    ``cvd``, the result for ``n`` up to 15 is a saved palette that was optimized with
+    many restarts (``restart_count`` is then ignored), so it returns instantly.
+
     The colors are ordered so that the first is the most distant from the
     background and each next is the farthest from those before it. Each ``n``
     is optimized separately: ``palette(4)`` is not a prefix of ``palette(5)``.
@@ -119,6 +127,14 @@ def palette(
     extra = np.concatenate([_parse_colors(exclude, "exclude"), _parse_colors(fixed, "fixed")])
     if n == 0:
         return []
+
+    if not (
+        len(extra) or cvd_views or seed != DEFAULT_SEED or min_contrast != DEFAULT_MIN_CONTRAST
+    ):
+        saved = preset_palette(n, background)
+        if saved is not None:
+            rgb8 = np.rint(np.array([hex_to_srgb(c) for c in saved]) * 255)
+            return format_colors(rgb8, color_format)
 
     anchors = np.concatenate([constraints.reference_labs, extra])
     result = optimize(seed, n, constraints, anchors, restart_count, cvd_views)

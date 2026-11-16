@@ -6,7 +6,7 @@ legend entries, cluster labels).
 ```python
 >>> from colorcat import palette
 >>> palette(5)
-['#d001ff', '#00ad01', '#680000', '#0000ce', '#ff4100']
+['#0000d4', '#ff4b00', '#01a600', '#6a0000', '#d500ff']
 >>> palette(8, background="black")
 ```
 
@@ -48,12 +48,18 @@ min_distance(palette(6))  # distance between the closest pair
 | `n` | | Number of colors, `>= 0`. |
 | `background` | `"white"` | `"white"` or `"black"`, the color the palette is drawn on. Other values raise `ValueError`. |
 | `min_contrast` | `3` | Minimum [WCAG contrast ratio](https://www.w3.org/TR/WCAG21/#dfn-contrast-ratio) (1 to 15) between every color and the background. 3 is the WCAG minimum for graphical objects such as chart marks; use 4.5 for text. Higher values leave fewer colors to choose from, so the closest-pair distance drops. |
-| `restart_count` | `4` | Independent optimizer runs (each followed by 16 basin-hopping moves); the best is kept. More is never worse, just slower (roughly 1-3.5 s for 4 at `n` up to 30). |
+| `restart_count` | `4` | Independent optimizer runs (each followed by 16 basin-hopping moves); the best is kept. More is never worse, just slower (roughly 1-3.5 s for 4 at `n` up to 30). Ignored when a saved palette is returned (see below). |
 | `exclude` | `()` | Hex colors the new colors must stay distinct from. Not returned. |
 | `fixed` | `()` | Hex colors already in use; the `n` new colors extend them. Never moved or returned, and exempt from the built-in ranges. |
 | `cvd` | `()` | One or more of `"protan"`, `"deutan"`, `"tritan"` (or a single name). Every pair must then be distinct to normal vision *and* as seen with each deficiency (full dichromacy, Machado et al. 2009 simulation). The closest-pair distance drops as views are added, more so for larger `n`. |
 | `color_format` | `"hex"` | `"hex"` (`"#rrggbb"`), `"rgb"` (0-255 ints), `"oklab"` (L, a, b) or `"oklch"` (L, C, h in degrees). |
 | `seed` | `0` | Seed for the random starting points; `None` uses fresh entropy. |
+
+**Instant results for common cases.** With the default `min_contrast` and `seed` and no `exclude`,
+`fixed` or `cvd`, `palette(n)` for `n` up to 15 returns a saved palette (optimized with 20
+restarts) instead of running the optimizer, so it is instant and `restart_count` has no effect.
+Any other argument, or a larger `n`, runs the optimizer. `benchmarks/presets.py` regenerates the
+saved palettes.
 
 Colors come back ordered so that the first is the most distant from the background and its
 opposite, and each next one is the farthest from those before it. Each `n` is optimized separately, so

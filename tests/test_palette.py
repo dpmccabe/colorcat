@@ -138,3 +138,42 @@ def test_colors_stay_distinct_from_background_and_its_opposite(background):
     # nor its opposite (plot lines, text) may be much closer than that.
     assert d[:, 0].min() > 0.3
     assert d[:, 1].min() > 0.3
+
+
+def test_presets_were_generated_with_the_default_settings():
+    from colorcat._presets import load
+    from colorcat.palette import DEFAULT_SEED
+
+    data = load()
+    assert data["seed"] == DEFAULT_SEED
+    assert data["min_contrast"] == get_constraints("white").min_contrast
+
+
+@pytest.mark.parametrize("background", ["white", "black"])
+def test_defaults_return_the_saved_palette(background):
+    from colorcat._presets import load
+
+    for n, saved in load()["palettes"][background].items():
+        assert palette(int(n), background=background) == saved
+    # restart_count does not matter for a saved palette.
+    assert palette(5, background=background, restart_count=1) == palette(5, background=background)
+
+
+def test_saved_palette_respects_color_format():
+    hexes = palette(4)
+    assert palette(4, color_format="rgb") == [
+        tuple(hex_to_srgb(c).__mul__(255).round().astype(int)) for c in hexes
+    ]
+    assert len(palette(4, color_format="oklab")[0]) == 3
+
+
+def test_any_non_default_option_skips_the_saved_palette():
+    saved = palette(3)
+    for kwargs in ({"seed": 5}, {"seed": None}, {"min_contrast": 4.5}, {"cvd": "deutan"}):
+        assert palette(3, restart_count=1, **kwargs) != saved  # pyrefly: ignore[bad-argument-type]
+    assert saved[0] not in palette(3, exclude=saved[:1], restart_count=1)
+    assert palette(3, fixed=saved[:1], restart_count=1) != saved
+
+
+def test_sizes_without_a_saved_palette_are_optimized():
+    assert len(palette(16, restart_count=1)) == 16
