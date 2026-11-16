@@ -1,6 +1,6 @@
 [project]
 name = "colorcat"
-version = "0.1.0"
+version = "0.2.1"
 description = "Generate maximally distinct colors for categorical data palettes."
 readme = "README.md"
 license = "MIT"
