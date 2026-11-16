@@ -5,26 +5,26 @@
 <text x="590" y="24" fill="#222222" font-weight="bold">as seen with deutan</text>
 <text x="794" y="24" fill="#222222" font-weight="bold">as seen with tritan</text>
 <text x="12" y="59.0" fill="#222222">cvd = (none)</text>
-<rect x="182" y="38" width="34" height="34" rx="3" fill="#0000d9"/>
-<rect x="219" y="38" width="34" height="34" rx="3" fill="#ff5301"/>
-<rect x="256" y="38" width="34" height="34" rx="3" fill="#6c0000"/>
-<rect x="293" y="38" width="34" height="34" rx="3" fill="#00ad01"/>
-<rect x="330" y="38" width="34" height="34" rx="3" fill="#d900ff"/>
-<rect x="386" y="38" width="34" height="34" rx="3" fill="#004ade"/>
-<rect x="423" y="38" width="34" height="34" rx="3" fill="#877600"/>
-<rect x="460" y="38" width="34" height="34" rx="3" fill="#2a2300"/>
-<rect x="497" y="38" width="34" height="34" rx="3" fill="#b19b00"/>
-<rect x="534" y="38" width="34" height="34" rx="3" fill="#0075ff"/>
-<rect x="590" y="38" width="34" height="34" rx="3" fill="#0033d6"/>
-<rect x="627" y="38" width="34" height="34" rx="3" fill="#b19d00"/>
-<rect x="664" y="38" width="34" height="34" rx="3" fill="#423a00"/>
-<rect x="701" y="38" width="34" height="34" rx="3" fill="#a29125"/>
-<rect x="738" y="38" width="34" height="34" rx="3" fill="#2e87fb"/>
-<rect x="794" y="38" width="34" height="34" rx="3" fill="#005a7f"/>
-<rect x="831" y="38" width="34" height="34" rx="3" fill="#ff0748"/>
-<rect x="868" y="38" width="34" height="34" rx="3" fill="#780002"/>
-<rect x="905" y="38" width="34" height="34" rx="3" fill="#00a892"/>
-<rect x="942" y="38" width="34" height="34" rx="3" fill="#d95696"/>
+<rect x="182" y="38" width="34" height="34" rx="3" fill="#0000d4"/>
+<rect x="219" y="38" width="34" height="34" rx="3" fill="#ff4b00"/>
+<rect x="256" y="38" width="34" height="34" rx="3" fill="#01a600"/>
+<rect x="293" y="38" width="34" height="34" rx="3" fill="#6a0000"/>
+<rect x="330" y="38" width="34" height="34" rx="3" fill="#d500ff"/>
+<rect x="386" y="38" width="34" height="34" rx="3" fill="#0048d9"/>
+<rect x="423" y="38" width="34" height="34" rx="3" fill="#837200"/>
+<rect x="460" y="38" width="34" height="34" rx="3" fill="#aa9500"/>
+<rect x="497" y="38" width="34" height="34" rx="3" fill="#292300"/>
+<rect x="534" y="38" width="34" height="34" rx="3" fill="#0074ff"/>
+<rect x="590" y="38" width="34" height="34" rx="3" fill="#0031d1"/>
+<rect x="627" y="38" width="34" height="34" rx="3" fill="#af9b00"/>
+<rect x="664" y="38" width="34" height="34" rx="3" fill="#9b8b22"/>
+<rect x="701" y="38" width="34" height="34" rx="3" fill="#413900"/>
+<rect x="738" y="38" width="34" height="34" rx="3" fill="#2385fb"/>
+<rect x="794" y="38" width="34" height="34" rx="3" fill="#00587c"/>
+<rect x="831" y="38" width="34" height="34" rx="3" fill="#ff0041"/>
+<rect x="868" y="38" width="34" height="34" rx="3" fill="#00a18c"/>
+<rect x="905" y="38" width="34" height="34" rx="3" fill="#760002"/>
+<rect x="942" y="38" width="34" height="34" rx="3" fill="#d45796"/>
 <text x="12" y="107.0" fill="#222222">cvd = protan</text>
 <rect x="182" y="86" width="34" height="34" rx="3" fill="#5800ff"/>
 <rect x="219" y="86" width="34" height="34" rx="3" fill="#989a00"/>
