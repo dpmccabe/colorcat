@@ -11,9 +11,20 @@ from colorcat._feasible import sample
 from colorcat._format import hex_to_oklab, quantize
 from colorcat._oklab import srgb_to_oklab
 
-# Named categorical palettes (Okabe-Ito without black; Tableau 10; Matplotlib tab10 is the same as Tableau's old 10).
+# Named categorical palettes (Okabe-Ito without black; seaborn/Matplotlib tab10 without its grey; Tableau 10; Set1).
 NAMED = {
     "okabe-ito": ["#e69f00", "#56b4e9", "#009e73", "#f0e442", "#0072b2", "#d55e00", "#cc79a7"],
+    "tab10": [
+        "#1f77b4",
+        "#ff7f0e",
+        "#2ca02c",
+        "#d62728",
+        "#9467bd",
+        "#8c564b",
+        "#e377c2",
+        "#bcbd22",
+        "#17becf",
+    ],
     "tableau10": [
         "#4e79a7",
         "#f28e2b",

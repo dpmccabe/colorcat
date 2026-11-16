@@ -1,12 +1,12 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 516 256" width="516" height="256">
 <rect width="516" height="256" fill="#000000"/>
-<text x="16" y="44" fill="#eee" font-size="13" font-family="system-ui, sans-serif">min_contrast 1.5</text>
-<rect x="120" y="20" width="40" height="48" rx="4" fill="#a50000"><title>#a50000</title></rect>
-<rect x="166" y="20" width="40" height="48" rx="4" fill="#00d601"><title>#00d601</title></rect>
-<rect x="212" y="20" width="40" height="48" rx="4" fill="#ff00ff"><title>#ff00ff</title></rect>
-<rect x="258" y="20" width="40" height="48" rx="4" fill="#1e00aa"><title>#1e00aa</title></rect>
-<rect x="304" y="20" width="40" height="48" rx="4" fill="#00a2ff"><title>#00a2ff</title></rect>
-<text x="360" y="38" fill="#eee" font-size="12" font-family="system-ui, sans-serif">min ΔE 0.348</text><text x="360" y="56" fill="#eee" opacity="0.6" font-size="11" font-family="system-ui, sans-serif">contrast ≥ 1.64</text>
+<text x="16" y="44" fill="#eee" font-size="13" font-family="system-ui, sans-serif">min_contrast 1.2</text>
+<rect x="120" y="20" width="40" height="48" rx="4" fill="#006201"><title>#006201</title></rect>
+<rect x="166" y="20" width="40" height="48" rx="4" fill="#ff0000"><title>#ff0000</title></rect>
+<rect x="212" y="20" width="40" height="48" rx="4" fill="#01db00"><title>#01db00</title></rect>
+<rect x="258" y="20" width="40" height="48" rx="4" fill="#01a3ff"><title>#01a3ff</title></rect>
+<rect x="304" y="20" width="40" height="48" rx="4" fill="#4700a8"><title>#4700a8</title></rect>
+<text x="360" y="38" fill="#eee" font-size="12" font-family="system-ui, sans-serif">min ΔE 0.349</text><text x="360" y="56" fill="#eee" opacity="0.6" font-size="11" font-family="system-ui, sans-serif">contrast ≥ 1.83</text>
 <text x="16" y="100" fill="#eee" font-size="13" font-family="system-ui, sans-serif">min_contrast 2</text>
 <rect x="120" y="76" width="40" height="48" rx="4" fill="#6e009e"><title>#6e009e</title></rect>
 <rect x="166" y="76" width="40" height="48" rx="4" fill="#00db01"><title>#00db01</title></rect>

@@ -57,7 +57,7 @@ def main() -> None:
             named = " ".join(
                 f"{k}={named_min_distance(k, n, c.reference_labs):.3f}"
                 for k in NAMED
-                if n <= len(NAMED[k])
+                if k in ("okabe-ito", "tab10") and n == len(NAMED[k])
             )
             print(
                 f"{n:>3} {main_score:>8.4f} {min(seeds):>7.4f}..{max(seeds):.4f} {sec:>6.2f} "

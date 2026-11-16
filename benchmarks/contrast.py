@@ -21,7 +21,7 @@ from colorcat._format import hex_to_srgb
 from colorcat._oklab import contrast_ratio, relative_luminance, srgb_to_linear
 
 N = 5
-RATIOS = (1.5, 2.0, 3.0, 4.5)
+RATIOS = (1.2, 2.0, 3.0, 4.5)
 BACKGROUNDS = ("white", "black")
 RESTART_COUNT = 20
 HERE = Path(__file__).parent

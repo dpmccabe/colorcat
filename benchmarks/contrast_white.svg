@@ -1,12 +1,12 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 516 256" width="516" height="256">
 <rect width="516" height="256" fill="#ffffff"/>
-<text x="16" y="44" fill="#222" font-size="13" font-family="system-ui, sans-serif">min_contrast 1.5</text>
-<rect x="120" y="20" width="40" height="48" rx="4" fill="#83009d"><title>#83009d</title></rect>
+<text x="16" y="44" fill="#222" font-size="13" font-family="system-ui, sans-serif">min_contrast 1.2</text>
+<rect x="120" y="20" width="40" height="48" rx="4" fill="#69009e"><title>#69009e</title></rect>
 <rect x="166" y="20" width="40" height="48" rx="4" fill="#01db00"><title>#01db00</title></rect>
-<rect x="212" y="20" width="40" height="48" rx="4" fill="#ff5300"><title>#ff5300</title></rect>
-<rect x="258" y="20" width="40" height="48" rx="4" fill="#015700"><title>#015700</title></rect>
-<rect x="304" y="20" width="40" height="48" rx="4" fill="#00a6ff"><title>#00a6ff</title></rect>
-<text x="360" y="38" fill="#222" font-size="12" font-family="system-ui, sans-serif">min ΔE 0.347</text><text x="360" y="56" fill="#222" opacity="0.6" font-size="11" font-family="system-ui, sans-serif">contrast ≥ 1.89</text>
+<rect x="212" y="20" width="40" height="48" rx="4" fill="#ff0000"><title>#ff0000</title></rect>
+<rect x="258" y="20" width="40" height="48" rx="4" fill="#01a4ff"><title>#01a4ff</title></rect>
+<rect x="304" y="20" width="40" height="48" rx="4" fill="#005e00"><title>#005e00</title></rect>
+<text x="360" y="38" fill="#222" font-size="12" font-family="system-ui, sans-serif">min ΔE 0.348</text><text x="360" y="56" fill="#222" opacity="0.6" font-size="11" font-family="system-ui, sans-serif">contrast ≥ 1.89</text>
 <text x="16" y="100" fill="#222" font-size="13" font-family="system-ui, sans-serif">min_contrast 2</text>
 <rect x="120" y="76" width="40" height="48" rx="4" fill="#990000"><title>#990000</title></rect>
 <rect x="166" y="76" width="40" height="48" rx="4" fill="#01d400"><title>#01d400</title></rect>

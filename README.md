@@ -107,15 +107,17 @@ python -m colorcat 6 --seed 3
 ### Quality
 
 `benchmarks/benchmark.py` compares `palette` with random feasible colors, greedy
-farthest-point sampling and Okabe-Ito / Tableau 10 / Set1. On white, the smallest
-pairwise ΔE_OK (including the background and its opposite) is:
+farthest-point sampling and two named palettes at the `n` that matches their size: Okabe-Ito at `n = 7` (its 8
+colors minus black) and seaborn's tab10 at `n = 9` (minus its grey `#7f7f7f`).
+On white, the smallest pairwise ΔE_OK (including the background and its opposite) is:
 
-| n | colorcat | farthest-point | random | best named palette |
-|---|---|---|---|---|
-| 5 | 0.33 | 0.31 | 0.07 | 0.17 |
-| 10 | 0.22 | 0.19 | 0.04 | 0.08 |
-| 20 | 0.17 | 0.13 | 0.02 | |
-| 30 | 0.14 | 0.11 | 0.02 | |
+| n | colorcat | farthest-point | random | Okabe-Ito | tab10 |
+|---|---|---|---|---|---|
+| 5 | 0.34 | 0.30 | 0.08 | | |
+| 7 | 0.31 | 0.25 | 0.06 | 0.16 | |
+| 9 | 0.26 | 0.20 | 0.05 | | 0.14 |
+| 20 | 0.18 | 0.14 | 0.03 | | |
+| 30 | 0.15 | 0.12 | 0.02 | | |
 
 Results vary by about 5% across seeds at small `n`.
 
